@@ -24,19 +24,16 @@ class AuthManager {
     }
 
     switchTab(tabName) {
-        // Remove active class from all tabs and forms
         document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
         document.querySelectorAll('.auth-form').forEach(form => form.classList.remove('active'));
 
-        // Add active class to clicked tab and corresponding form
         document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
-        document.getElementById(tabName).classList.add('active');
-
-        // Add animation effect
         const activeForm = document.getElementById(tabName);
+        activeForm.classList.add('active');
+
         activeForm.style.transform = 'translateX(-20px)';
         activeForm.style.opacity = '0';
-        
+
         setTimeout(() => {
             activeForm.style.transform = 'translateX(0)';
             activeForm.style.opacity = '1';
@@ -49,13 +46,11 @@ class AuthManager {
         const formData = new FormData(form);
         const formType = form.closest('.auth-form').id;
 
-        // Add loading state
         const submitBtn = form.querySelector('.auth-btn');
         const originalText = submitBtn.textContent;
         submitBtn.textContent = 'Processing...';
         submitBtn.disabled = true;
 
-        // Simulate API call
         setTimeout(() => {
             this.processAuth(formType, formData);
             submitBtn.textContent = originalText;
@@ -78,31 +73,72 @@ class AuthManager {
     }
 
     handleLogin(formData) {
-        // Simulate login success
-        this.showMessage('Login successful! Redirecting...', 'success');
-        setTimeout(() => {
-            window.location.href = '../home/home.html';
-        }, 1500);
+        // CORRECTED: Use proper field names from the FormData object (from name attribute, not ID)
+        const email = formData.get('email');      // was: formData.get('login-email')
+        const password = formData.get('password'); // was: formData.get('login-password')
+        const role = document.getElementById('login-role-toggle').checked ? 'teacher' : 'student'; // unchanged
+
+        fetch('http://localhost:5000/api/auth/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, role }) // unchanged
+        })
+        .then(res => res.json().then(data => ({ status: res.status, body: data })))
+        .then(({ status, body }) => {
+            if (status === 200) {
+                localStorage.setItem('token', body.token);
+                this.showMessage('Login successful! Redirecting...', 'success');
+                setTimeout(() => {
+                    window.location.href = '../home/home.html';
+                }, 1500);
+            } else {
+                this.showMessage(body.message || 'Login failed', 'error');
+            }
+        })
+        .catch(() => {
+            this.showMessage('Server error during login', 'error');
+        });
     }
 
     handleSignup(formData) {
-        // Simulate signup success
-        this.showMessage('Account created successfully! Please login.', 'success');
-        setTimeout(() => {
-            this.switchTab('login');
-        }, 1500);
+        const name = formData.get('name');
+        const email = formData.get('email');
+        const password = formData.get('password');
+        const confirm = formData.get('confirmPassword');
+        const role = document.getElementById('signup-role-toggle').checked ? 'teacher' : 'student';
+
+        if (password !== confirm) {
+            this.showMessage("Passwords don't match", 'error');
+            return;
+        }
+
+        fetch('http://localhost:5000/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name, email, password, role })
+        })
+        .then(res => res.json().then(data => ({ status: res.status, body: data })))
+        .then(({ status, body }) => {
+            if (status === 201) {
+                this.showMessage('Account created! Please login.', 'success');
+                setTimeout(() => this.switchTab('login'), 1500);
+            } else {
+                this.showMessage(body.message || 'Signup failed', 'error');
+            }
+        })
+        .catch(() => {
+            this.showMessage('Server error during signup', 'error');
+        });
     }
 
     handleForgotPassword(formData) {
-        // Simulate password reset
-        this.showMessage('Password reset email sent! Check your inbox.', 'success');
+        const email = formData.get('forgot-email');
+        this.showMessage(`If ${email} exists, a reset link will be sent.`, 'success');
     }
 
     handleRoleToggle(e) {
         const toggle = e.target;
         const label = toggle.nextElementSibling;
-        
-        // Add visual feedback
         label.style.transform = 'scale(0.95)';
         setTimeout(() => {
             label.style.transform = 'scale(1)';
@@ -110,12 +146,10 @@ class AuthManager {
     }
 
     showMessage(message, type) {
-        // Create message element
         const messageEl = document.createElement('div');
         messageEl.className = `message ${type}`;
         messageEl.textContent = message;
-        
-        // Style the message
+
         messageEl.style.cssText = `
             position: fixed;
             top: 20px;
@@ -129,7 +163,6 @@ class AuthManager {
             background: ${type === 'success' ? '#4CAF50' : '#f44336'};
         `;
 
-        // Add animation keyframes
         if (!document.querySelector('#message-styles')) {
             const style = document.createElement('style');
             style.id = 'message-styles';
@@ -148,7 +181,6 @@ class AuthManager {
 
         document.body.appendChild(messageEl);
 
-        // Remove message after 3 seconds
         setTimeout(() => {
             messageEl.style.animation = 'slideOut 0.3s ease-out';
             setTimeout(() => {
@@ -158,10 +190,8 @@ class AuthManager {
     }
 }
 
-// Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new AuthManager();
 });
 
-// Add smooth scroll behavior for better UX
 document.documentElement.style.scrollBehavior = 'smooth';
