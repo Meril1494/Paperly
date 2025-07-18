@@ -8,13 +8,13 @@ class DashboardManager {
 
     initCounters() {
         const counters = document.querySelectorAll('.stat-number');
-        
+
         counters.forEach(counter => {
             const finalValue = parseInt(counter.textContent);
             const duration = 1500;
             const increment = finalValue / (duration / 16);
             let currentValue = 0;
-            
+
             const timer = setInterval(() => {
                 currentValue += increment;
                 if (currentValue >= finalValue) {
@@ -28,7 +28,6 @@ class DashboardManager {
     }
 
     initInteractions() {
-        // Add click handlers for action cards
         const actionCards = document.querySelectorAll('.action-card');
         actionCards.forEach(card => {
             card.addEventListener('click', (e) => {
@@ -36,7 +35,6 @@ class DashboardManager {
             });
         });
 
-        // Add click handlers for note items
         const noteItems = document.querySelectorAll('.note-item');
         noteItems.forEach(item => {
             item.addEventListener('click', (e) => {
@@ -44,13 +42,12 @@ class DashboardManager {
             });
         });
 
-        // Add hover effects
         const interactiveElements = document.querySelectorAll('.stat-card, .action-card, .note-item, .update-item');
         interactiveElements.forEach(element => {
             element.addEventListener('mouseenter', () => {
                 this.addHoverEffect(element);
             });
-            
+
             element.addEventListener('mouseleave', () => {
                 this.removeHoverEffect(element);
             });
@@ -58,18 +55,16 @@ class DashboardManager {
     }
 
     handleActionClick(card) {
-        // Add click animation
         card.style.transform = 'translateY(-3px) scale(0.95)';
-        
+
         setTimeout(() => {
             card.style.transform = 'translateY(-3px) scale(1)';
         }, 150);
     }
 
     handleNoteClick(item) {
-        // Add click feedback
         item.style.background = 'rgba(9, 12, 2, 0.05)';
-        
+
         setTimeout(() => {
             item.style.background = 'rgba(9, 12, 2, 0.02)';
         }, 200);
@@ -88,10 +83,33 @@ class DashboardManager {
     }
 
     loadRecentData() {
-        // Simulate loading recent data
         this.animateActivityItems();
         this.animateNoteItems();
         this.animateUpdateItems();
+
+        // NEW: Fetch joined classrooms and log the codes
+        fetch('/api/classroom/joined', {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            console.log('Joined Classrooms:', data);
+            const classroomList = document.getElementById('joined-classrooms');
+            if (classroomList && Array.isArray(data.classrooms)) {
+                classroomList.innerHTML = '';
+                data.classrooms.forEach(cls => {
+                    const li = document.createElement('li');
+                    li.textContent = `${cls.name} (${cls.code})`;
+                    classroomList.appendChild(li);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching joined classrooms:', error);
+        });
     }
 
     animateActivityItems() {
@@ -99,7 +117,7 @@ class DashboardManager {
         activityItems.forEach((item, index) => {
             item.style.opacity = '0';
             item.style.transform = 'translateX(-20px)';
-            
+
             setTimeout(() => {
                 item.style.transition = 'all 0.3s ease';
                 item.style.opacity = '1';
@@ -113,7 +131,7 @@ class DashboardManager {
         noteItems.forEach((item, index) => {
             item.style.opacity = '0';
             item.style.transform = 'translateY(20px)';
-            
+
             setTimeout(() => {
                 item.style.transition = 'all 0.3s ease';
                 item.style.opacity = '1';
@@ -127,7 +145,7 @@ class DashboardManager {
         updateItems.forEach((item, index) => {
             item.style.opacity = '0';
             item.style.transform = 'translateX(20px)';
-            
+
             setTimeout(() => {
                 item.style.transition = 'all 0.3s ease';
                 item.style.opacity = '1';
@@ -137,7 +155,6 @@ class DashboardManager {
     }
 
     initAnimations() {
-        // Add intersection observer for scroll-triggered animations
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -149,16 +166,13 @@ class DashboardManager {
             rootMargin: '0px 0px -50px 0px'
         });
 
-        // Observe cards for animation
         const cards = document.querySelectorAll('.activity-section, .quick-actions, .recent-notes, .group-updates');
         cards.forEach(card => observer.observe(card));
     }
 
-    // Method to refresh dashboard data
     refreshDashboard() {
-        // Simulate data refresh
         this.showLoadingState();
-        
+
         setTimeout(() => {
             this.loadRecentData();
             this.hideLoadingState();
@@ -182,21 +196,55 @@ class DashboardManager {
     }
 }
 
-// Add refresh functionality
 function refreshDashboard() {
     const dashboard = new DashboardManager();
     dashboard.refreshDashboard();
 }
 
-// Initialize dashboard when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     new DashboardManager();
 });
 
-// Add keyboard navigation
 document.addEventListener('keydown', (e) => {
     if (e.key === 'r' && (e.ctrlKey || e.metaKey)) {
         e.preventDefault();
         refreshDashboard();
     }
+});
+
+// Fetch joined classrooms
+function fetchJoinedClassrooms() {
+  fetchWithToken('/api/classrooms/joined')
+    .then(res => res.json())
+    .then(data => {
+      if (Array.isArray(data)) {
+        renderJoinedClassrooms(data);
+      } else {
+        console.error('Unexpected response:', data);
+      }
+    })
+    .catch(err => {
+      console.error('Error fetching joined classrooms:', err);
+    });
+}
+
+// Render joined classrooms
+function renderJoinedClassrooms(classrooms) {
+  const joinedList = document.getElementById('joined-classrooms');
+  joinedList.innerHTML = '';
+
+  classrooms.forEach(classroom => {
+    const li = document.createElement('li');
+    li.className = 'classroom-card';
+    li.innerHTML = `
+      <h3>${classroom.name}</h3>
+      <p>Code: ${classroom.code}</p>
+    `;
+    joinedList.appendChild(li);
+  });
+}
+
+// Add call to fetchJoinedClassrooms on DOM load (if not already present)
+document.addEventListener('DOMContentLoaded', () => {
+  fetchJoinedClassrooms();
 });

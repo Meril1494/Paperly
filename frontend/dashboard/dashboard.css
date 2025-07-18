@@ -392,3 +392,19 @@ body {
         grid-template-columns: 1fr;
     }
 }
+
+.joined-classrooms-container {
+  margin-top: 30px;
+  padding: 15px;
+  background: #f9f9f9;
+  border-radius: 10px;
+}
+
+.joined-classroom-card {
+  padding: 10px;
+  margin-bottom: 8px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-weight: 500;
+}

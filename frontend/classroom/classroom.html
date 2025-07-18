@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paperly - Manage Your Classrooms</title>
+  <link rel="stylesheet" href="../common/sidebar.css" />
+  <link rel="stylesheet" href="classroom.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="main-content">
+    <header class="page-header">
+      <div class="header-content">
+        <h1 class="page-title">Manage Your Classrooms</h1>
+        <p class="page-subtitle">Create new classrooms or join existing ones</p>
+      </div>
+    </header>
+
+    <main class="classroom-main">
+      <div class="classroom-container">
+        <!-- Create Classroom Card -->
+        <div class="classroom-card">
+          <div class="card-header">
+            <div class="card-icon">🏫</div>
+            <h2 class="card-title">Create a Classroom</h2>
+          </div>
+          <form id="createForm" class="classroom-form">
+            <div class="form-group">
+              <label for="className">Classroom Name</label>
+              <input type="text" id="className" placeholder="Enter classroom name" required />
+            </div>
+            <div class="form-group">
+              <label for="classSubject">Subject</label>
+              <input type="text" id="classSubject" placeholder="Enter subject" required />
+            </div>
+            <button class="btn-primary" type="submit">
+              <span class="btn-icon">+</span>
+              Create Classroom
+            </button>
+          </form>
+        </div>
+
+        <!-- Join Classroom Card -->
+        <div class="classroom-card">
+          <div class="card-header">
+            <div class="card-icon">🔗</div>
+            <h2 class="card-title">Join a Classroom</h2>
+          </div>
+          <form id="joinForm" class="classroom-form">
+            <div class="form-group">
+              <label for="joinCode">Classroom Code</label>
+              <input type="text" id="joinCode" placeholder="Enter classroom code" required />
+            </div>
+            <button class="btn-secondary" type="submit">
+              <span class="btn-icon">→</span>
+              Join Classroom
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Recent Classrooms Section -->
+      <div class="recent-section">
+        <h3 class="section-title">Recent Classrooms</h3>
+        <div class="recent-classrooms" id="recentClassrooms">
+          <!-- Recent classrooms will be populated by JavaScript -->
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="../common/sidebar.js"></script>
+  <script src="classroom.js"></script>
+</body>
+</html>

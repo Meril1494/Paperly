@@ -40,6 +40,10 @@ class Sidebar {
                         <span class="nav-icon">💬</span>
                         <span class="nav-text">Chatbox</span>
                     </a>
+                    <a href="../classroom/classroom.html" class="nav-item" data-page="classroom">
+                        <span class="nav-icon">🏫</span>
+                        <span class="nav-text">Classroom</span>
+                    </a>
                     <a href="../ai/ai.html" class="nav-item" data-page="ai">
                         <span class="nav-icon">🤖</span>
                         <span class="nav-text">AI Summarizer</span>
