@@ -6,6 +6,7 @@ const fileRoutes = require('./routes/fileRoutes');
 const classroomRoutes = require('./routes/classroomRoutes');
 const path = require('path');
 const cors = require('cors');
+const postRoutes = require('./routes/postRoutes');
 
 // Load .env variables
 dotenv.config();
@@ -18,6 +19,7 @@ const app = express();
 // Middleware
 app.use(cors());
 app.use(express.json()); // to parse JSON bodies
+app.use('/api/posts', postRoutes);
 
 // Serve uploaded files statically
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));

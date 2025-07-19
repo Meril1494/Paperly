@@ -22,7 +22,17 @@ exports.createClassroom = async (req, res) => {
       $addToSet: { classrooms: classroom._id }
     });
 
-    res.status(201).json({ message: 'Classroom created', classroom });
+    // ✅ UPDATED RESPONSE: Send selected fields including _id
+    res.status(201).json({
+      message: 'Classroom created',
+      classroom: {
+        _id: classroom._id,
+        name: classroom.name,
+        description: classroom.description,
+        code: classroom.code
+      }
+    });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -45,7 +55,17 @@ exports.joinClassroom = async (req, res) => {
       });
     }
 
-    res.json({ message: 'Joined classroom', classroom });
+    // ✅ UPDATED RESPONSE: Send selected fields including _id
+    res.json({
+      message: 'Joined classroom',
+      classroom: {
+        _id: classroom._id,
+        name: classroom.name,
+        description: classroom.description,
+        code: classroom.code
+      }
+    });
+
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
@@ -63,4 +83,3 @@ exports.getMyClassrooms = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
-

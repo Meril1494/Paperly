@@ -263,12 +263,10 @@ class ClassroomManager {
 
 // Global function for classroom item clicks
 function openClassroom(classroomId) {
-    // This would typically navigate to a classroom detail page
-    console.log('Opening classroom:', classroomId);
-    // For now, just show a message
-    const manager = new ClassroomManager();
-    manager.showMessage('Classroom feature coming soon!', 'info');
+    // Navigate to classroom detail page
+    window.location.href = `classroom-view.html?id=${classroomId}`;
 }
+
 
 // Initialize classroom manager
 document.addEventListener('DOMContentLoaded', () => {
