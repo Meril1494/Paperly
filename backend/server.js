@@ -8,6 +8,7 @@ const path = require('path');
 const cors = require('cors');
 const postRoutes = require('./routes/postRoutes');
 
+
 // Load .env variables
 dotenv.config();
 
@@ -22,7 +23,17 @@ app.use(express.json()); // to parse JSON bodies
 app.use('/api/posts', postRoutes);
 
 // Serve uploaded files statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+//app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Ensure uploads folder exists
+const fs = require('fs');
+const uploadsDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadsDir)) {
+  fs.mkdirSync(uploadsDir);
+}
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(uploadsDir));
+
 
 // Debug logger for all incoming requests
 app.use((req, res, next) => {
