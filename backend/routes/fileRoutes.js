@@ -1,3 +1,4 @@
+const { GridFsStorage } = require('multer-gridfs-storage');
 const express = require('express');
 const router = express.Router();
 const multer = require('multer');
@@ -6,16 +7,17 @@ const ClassroomContent = require('../models/ClassroomContent');
 const auth = require('../middleware/auth');
 
 // Multer storage config
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/');
-  },
-  filename: function (req, file, cb) {
-    const ext = path.extname(file.originalname);
-    const name = file.fieldname + '-' + Date.now() + ext;
-    cb(null, name);
-  }
+// MongoDB URI from your .env or fallback
+const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/paperly';
+
+const storage = new GridFsStorage({
+  url: mongoURI,
+  file: (req, file) => ({
+    bucketName: 'uploads', // GridFS bucket name
+    filename: `${Date.now()}-${file.originalname}`,
+  }),
 });
+
 
 const upload = multer({ storage });
 
@@ -28,7 +30,8 @@ router.post('/upload/:classroomId', auth, upload.single('file'), async (req, res
       classroom: classroomId,
       type: 'resource',
       title: req.file.originalname,
-      fileUrl: `/uploads/${req.file.filename}`,
+      fileId: req.file.id,         
+      fileName: req.file.filename, 
       createdBy: req.user._id
     });
 

@@ -214,19 +214,28 @@ document.addEventListener('keydown', (e) => {
 
 // Fetch joined classrooms
 function fetchJoinedClassrooms() {
-  fetchWithToken('/api/classrooms/joined')
+  const token = localStorage.getItem('token');
+
+  fetch('/api/classroom/my', {
+    headers: {
+      'Authorization': `Bearer ${token}`
+    }
+  })
     .then(res => res.json())
     .then(data => {
       if (Array.isArray(data)) {
         renderJoinedClassrooms(data);
+      } else if (data.classrooms) {
+        renderJoinedClassrooms(data.classrooms);
       } else {
         console.error('Unexpected response:', data);
       }
     })
     .catch(err => {
-      console.error('Error fetching joined classrooms:', err);
+      console.error('Error fetching classrooms:', err);
     });
 }
+
 
 // Render joined classrooms
 function renderJoinedClassrooms(classrooms) {
@@ -236,15 +245,83 @@ function renderJoinedClassrooms(classrooms) {
   classrooms.forEach(classroom => {
     const li = document.createElement('li');
     li.className = 'classroom-card';
+    li.setAttribute('data-id', classroom._id);
     li.innerHTML = `
       <h3>${classroom.name}</h3>
       <p>Code: ${classroom.code}</p>
+      <button class="delete-classroom-btn">Delete</button>
     `;
     joinedList.appendChild(li);
   });
+
+  // ✅ Attach event listeners to delete buttons
+  const deleteButtons = document.querySelectorAll('.delete-classroom-btn');
+  deleteButtons.forEach(button => {
+    button.addEventListener('click', async (e) => {
+      const classroomCard = e.target.closest('.classroom-card');
+      const classroomId = classroomCard.getAttribute('data-id');
+
+      const confirmDelete = confirm("Are you sure you want to delete this classroom?");
+      if (!confirmDelete) return;
+
+      try {
+        const res = await fetch(`/api/classrooms/${classroomId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${localStorage.getItem('token')}`,
+          }
+        });
+
+        const result = await res.json();
+        if (res.ok) {
+          alert('Classroom deleted successfully');
+          classroomCard.remove(); // remove from DOM
+        } else {
+          alert(result.error || 'Failed to delete classroom');
+        }
+      } catch (err) {
+        console.error(err);
+        alert('An error occurred while deleting the classroom');
+      }
+    });
+  });
 }
+
+
 
 // Add call to fetchJoinedClassrooms on DOM load (if not already present)
 document.addEventListener('DOMContentLoaded', () => {
   fetchJoinedClassrooms();
+});
+
+document.addEventListener('click', async (e) => {
+  if (e.target.classList.contains('delete-classroom-btn')) {
+    const card = e.target.closest('.classroom-card');
+    const classroomId = card.getAttribute('data-id');
+
+    if (confirm('Are you sure you want to delete this classroom?')) {
+      try {
+        const token = localStorage.getItem('token');
+
+        const res = await fetch(`/api/classroom/${classroomId}`, {
+          method: 'DELETE',
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        const data = await res.json();
+
+        if (res.ok) {
+          alert(data.message || 'Classroom deleted successfully');
+          card.remove();
+        } else {
+          alert(data.error || 'Failed to delete classroom');
+        }
+      } catch (err) {
+        console.error('Delete failed:', err);
+        alert('Something went wrong');
+      }
+    }
+  }
 });

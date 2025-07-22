@@ -408,3 +408,18 @@ body {
   border-radius: 8px;
   font-weight: 500;
 }
+
+.delete-classroom-btn {
+  background-color: #e74c3c;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin-top: 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.delete-classroom-btn:hover {
+  background-color: #c0392b;
+}
+
