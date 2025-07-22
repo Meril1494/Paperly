@@ -1,12 +1,15 @@
 class ClassroomManager {
     constructor() {
         this.recentClassrooms = this.loadRecentClassrooms();
+        this.currentClassroom = null;
+        this.resources = this.loadResources();
         this.init();
     }
 
     init() {
         this.initEventListeners();
         this.renderRecentClassrooms();
+        this.initResourceUpload();
     }
 
     initEventListeners() {
@@ -17,6 +20,81 @@ class ClassroomManager {
         document.getElementById("joinForm").addEventListener("submit", (e) => {
             this.handleJoinClassroom(e);
         });
+
+        // Classroom tabs
+        const classroomTabs = document.querySelectorAll('.classroom-tab');
+        classroomTabs.forEach(tab => {
+            tab.addEventListener('click', (e) => {
+                this.switchClassroomTab(e.target.dataset.tab);
+            });
+        });
+
+        // Resource upload form
+       document.addEventListener('DOMContentLoaded', () => {
+    const resourceForm = document.getElementById('resourceUploadForm');
+
+    if (resourceForm) {
+        resourceForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const manager = new ClassroomManager(); // ✅ create instance
+            manager.handleResourceUpload(e);        // ✅ call instance method
+        });
+
+    } else {
+        console.error('resourceUploadForm not found in DOM.');
+    }
+});
+
+    }
+
+    initResourceUpload() {
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('resourceFile');
+
+        // Click to upload
+        uploadArea.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+
+        uploadArea.addEventListener('dragleave', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                fileInput.files = files;
+                this.updateFileDisplay(files);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                this.updateFileDisplay(e.target.files);
+            }
+        });
+    }
+
+    updateFileDisplay(files) {
+        const uploadContent = document.querySelector('.upload-content');
+        const fileList = Array.from(files).map(file => file.name).join(', ');
+        
+        uploadContent.innerHTML = `
+            <div class="upload-icon">📁</div>
+            <h4>Files Selected</h4>
+            <p>${fileList}</p>
+        `;
     }
 
     async handleCreateClassroom(e) {
@@ -47,7 +125,7 @@ class ClassroomManager {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    Authorization: token,
                 },
                 body: JSON.stringify({
                     name: className,
@@ -109,7 +187,7 @@ class ClassroomManager {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
+                    Authorization: token,
                 },
                 body: JSON.stringify({
                     code: joinCode,
@@ -141,6 +219,207 @@ class ClassroomManager {
             submitBtn.innerHTML = originalText;
             submitBtn.disabled = false;
         }
+    }
+
+    async handleResourceUpload(e) {
+        const fileInput = document.getElementById('resourceFile');
+        const title = document.getElementById('resourceTitle').value.trim();
+        const description = document.getElementById('resourceDescription').value.trim();
+
+        if (!fileInput.files.length || !title) {
+            this.showMessage('Please select files and enter a title', 'error');
+            return;
+        }
+
+        const submitBtn = e.target.querySelector('button[type="submit"]');
+        const originalText = submitBtn.innerHTML;
+        submitBtn.innerHTML = '<div class="loading-spinner"></div>Uploading...';
+        submitBtn.disabled = true;
+
+        try {
+            // Simulate file upload (in real app, would upload to server)
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            // Add resources to local storage
+            Array.from(fileInput.files).forEach(file => {
+                const resource = {
+                    id: Date.now() + Math.random(),
+                    title: title,
+                    description: description,
+                    fileName: file.name,
+                    fileSize: file.size,
+                    fileType: file.type || this.getFileType(file.name),
+                    uploadDate: new Date().toISOString(),
+                    classroomId: this.currentClassroom?.id || 1
+                };
+                this.resources.push(resource);
+            });
+
+            this.saveResources();
+            this.renderResources();
+            
+            // Reset form
+            document.getElementById('resourceUploadForm').reset();
+            this.resetUploadArea();
+            
+            this.showMessage('Resources uploaded successfully!', 'success');
+        } catch (err) {
+            console.error('Upload error:', err);
+            this.showMessage('Error uploading resources', 'error');
+        } finally {
+            submitBtn.innerHTML = originalText;
+            submitBtn.disabled = false;
+        }
+    }
+
+    resetUploadArea() {
+        const uploadContent = document.querySelector('.upload-content');
+        uploadContent.innerHTML = `
+            <div class="upload-icon">📁</div>
+            <h4>Drop files here or click to browse</h4>
+            <p>Supported formats: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, TXT</p>
+        `;
+    }
+
+    getFileType(fileName) {
+        const extension = fileName.split('.').pop().toLowerCase();
+        const types = {
+            pdf: 'application/pdf',
+            doc: 'application/msword',
+            docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+            ppt: 'application/vnd.ms-powerpoint',
+            pptx: 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+            xls: 'application/vnd.ms-excel',
+            xlsx: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            txt: 'text/plain'
+        };
+        return types[extension] || 'application/octet-stream';
+    }
+
+    loadResources() {
+        const saved = localStorage.getItem('paperly_classroom_resources');
+        if (saved) {
+            return JSON.parse(saved);
+        }
+        
+        // Default resources for demo
+        return [
+            {
+                id: 1,
+                title: 'Physics Chapter 1 Notes',
+                description: 'Introduction to mechanics and motion',
+                fileName: 'physics_ch1.pdf',
+                fileSize: 2048576,
+                fileType: 'application/pdf',
+                uploadDate: new Date(Date.now() - 86400000).toISOString(),
+                classroomId: 1
+            },
+            {
+                id: 2,
+                title: 'Math Assignment Template',
+                description: 'Template for homework submissions',
+                fileName: 'math_template.docx',
+                fileSize: 1024000,
+                fileType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+                uploadDate: new Date(Date.now() - 172800000).toISOString(),
+                classroomId: 1
+            }
+        ];
+    }
+
+    saveResources() {
+        localStorage.setItem('paperly_classroom_resources', JSON.stringify(this.resources));
+    }
+
+    renderResources() {
+        const grid = document.getElementById('resourcesGrid');
+        const classroomResources = this.resources.filter(r => 
+            r.classroomId === (this.currentClassroom?.id || 1)
+        );
+        
+        if (classroomResources.length === 0) {
+            grid.innerHTML = `
+                <div class="empty-resources">
+                    <div class="empty-icon">📁</div>
+                    <div>No resources uploaded yet</div>
+                </div>
+            `;
+            return;
+        }
+
+        grid.innerHTML = classroomResources.map(resource => `
+            <div class="resource-item">
+                <div class="resource-header">
+                    <div class="resource-icon">${this.getFileIcon(resource.fileType)}</div>
+                    <div class="resource-info">
+                        <div class="resource-title">${resource.title}</div>
+                        <div class="resource-meta">
+                            ${this.formatFileSize(resource.fileSize)} • ${this.formatDate(resource.uploadDate)}
+                        </div>
+                    </div>
+                </div>
+                ${resource.description ? `<div class="resource-description">${resource.description}</div>` : ''}
+                <div class="resource-actions">
+                    <a href="#" class="resource-btn primary" onclick="downloadResource(${resource.id})">
+                        📥 Download
+                    </a>
+                    <button class="resource-btn" onclick="deleteResource(${resource.id})">
+                        🗑️ Delete
+                    </button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    getFileIcon(fileType) {
+        const icons = {
+            'application/pdf': '📄',
+            'application/msword': '📝',
+            'application/vnd.openxmlformats-officedocument.wordprocessingml.document': '📝',
+            'application/vnd.ms-powerpoint': '📊',
+            'application/vnd.openxmlformats-officedocument.presentationml.presentation': '📊',
+            'application/vnd.ms-excel': '📈',
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': '📈',
+            'text/plain': '📄'
+        };
+        return icons[fileType] || '📁';
+    }
+
+    switchClassroomTab(tabName) {
+        // Remove active class from all tabs and panels
+        document.querySelectorAll('.classroom-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.remove('active'));
+
+        // Add active class to clicked tab and corresponding panel
+        document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+        document.getElementById(tabName).classList.add('active');
+
+        // Load content based on tab
+        if (tabName === 'resources') {
+            this.renderResources();
+        } else if (tabName === 'members') {
+            this.renderMembers();
+        }
+    }
+
+    renderMembers() {
+        const membersList = document.getElementById('membersList');
+        const mockMembers = [
+            { name: 'John Doe', role: 'Teacher', avatar: 'JD' },
+            { name: 'Alice Johnson', role: 'Student', avatar: 'AJ' },
+            { name: 'Bob Smith', role: 'Student', avatar: 'BS' },
+            { name: 'Carol Davis', role: 'Student', avatar: 'CD' }
+        ];
+
+        membersList.innerHTML = mockMembers.map(member => `
+            <div class="member-item">
+                <div class="member-avatar">${member.avatar}</div>
+                <div class="member-info">
+                    <div class="member-name">${member.name}</div>
+                    <div class="member-role">${member.role}</div>
+                </div>
+            </div>
+        `).join('');
     }
 
     loadRecentClassrooms() {
@@ -201,7 +480,7 @@ class ClassroomManager {
         }
 
         container.innerHTML = this.recentClassrooms.map(classroom => `
-            <div class="recent-classroom-item" onclick="openClassroom(${classroom.id})">
+            <div class="recent-classroom-item" onclick="openClassroomView(${classroom.id})">
                 <div class="recent-classroom-header">
                     <div class="recent-classroom-icon">${classroom.role === 'teacher' ? '👨‍🏫' : '👨‍🎓'}</div>
                     <div class="recent-classroom-name">${classroom.name}</div>
@@ -259,18 +538,76 @@ class ClassroomManager {
             }, 300);
         }, 3000);
     }
+
+    openClassroomView(classroomId) {
+        const classroom = this.recentClassrooms.find(c => c.id === classroomId);
+        if (classroom) {
+            this.currentClassroom = classroom;
+            
+            // Populate classroom info
+            document.getElementById('classroomTitle').textContent = classroom.name;
+            document.getElementById('classroomSubject').textContent = classroom.subject;
+            document.getElementById('classroomCreated').textContent = this.formatDate(classroom.joinedAt);
+            document.getElementById('classroomMemberCount').textContent = '4 members';
+            document.getElementById('classroomRole').textContent = classroom.role;
+            
+            // Show modal
+            document.getElementById('classroomViewModal').classList.add('active');
+            
+            // Load default tab content
+            this.renderResources();
+        }
+    }
+
+    closeClassroomView() {
+        document.getElementById('classroomViewModal').classList.remove('active');
+        this.currentClassroom = null;
+    }
 }
 
-// Global function for classroom item clicks
-function openClassroom(classroomId) {
-    // Navigate to classroom detail page
-    window.location.href = `classroom-view.html?id=${classroomId}`;
+// Global functions for HTML onclick handlers
+function openClassroomView(classroomId) {
+    classroomManager.openClassroomView(classroomId);
 }
 
+function closeClassroomView() {
+    classroomManager.closeClassroomView();
+}
+
+function downloadResource(resourceId) {
+    const resource = classroomManager.resources.find(r => r.id === resourceId);
+    if (resource) {
+        // In a real app, this would download the actual file
+        classroomManager.showMessage(`Downloading ${resource.fileName}...`, 'info');
+        
+        // Simulate download
+        const link = document.createElement('a');
+        link.href = '#';
+        link.download = resource.fileName;
+        link.click();
+    }
+}
+
+function deleteResource(resourceId) {
+    if (confirm('Are you sure you want to delete this resource?')) {
+        classroomManager.resources = classroomManager.resources.filter(r => r.id !== resourceId);
+        classroomManager.saveResources();
+        classroomManager.renderResources();
+        classroomManager.showMessage('Resource deleted successfully!', 'success');
+    }
+}
 
 // Initialize classroom manager
+let classroomManager;
 document.addEventListener('DOMContentLoaded', () => {
-    new ClassroomManager();
+    classroomManager = new ClassroomManager();
+});
+
+// Close modal when clicking outside
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('modal-overlay')) {
+        closeClassroomView();
+    }
 });
 
 // Add CSS for animations

@@ -48,17 +48,27 @@ let documents = [
 ];
 
 // Initialize the classroom when page loads
-document.addEventListener('DOMContentLoaded', function() {
-    initializeClassroom();
-    updateClassDuration();
-    updateParticipantCount();
+document.addEventListener("DOMContentLoaded", function () {
+  const resourceForm = document.getElementById("resource-form");
+
+  if (resourceForm) {
+    resourceForm.addEventListener("submit", function (event) {
+      event.preventDefault();
+      uploadFile("resource");
+    });
+  }
+});
+
+const classroomIdInput = document.getElementById('classroom-id');
+let classroomId = classroomIdInput ? classroomIdInput.value : window.location.pathname.split('/').pop().replace('.html','');
+ 
     
     // Update class duration every minute
     setInterval(updateClassDuration, 60000);
     
     // Simulate participant activity
     setInterval(simulateParticipantActivity, 30000);
-});
+
 
 // Initialize classroom functionality
 function initializeClassroom() {
@@ -479,3 +489,43 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 });
+function uploadFile(type) {
+  const fileInput = document.getElementById(type + '-file');
+  const titleInput = document.getElementById(type + '-title');
+
+  const file = fileInput.files[0];
+  const title = titleInput.value;
+
+  if (!file || !title) {
+    alert('Please select a file and enter a title.');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('title', title);
+  formData.append('type', type);
+  formData.append('classroomId', classroomId); // classroomId must be defined globally
+
+  fetch(`/api/files/upload/${classroomId}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    },
+    body: formData
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.message === 'File uploaded successfully') {
+        alert('Upload successful!');
+        // Optionally reload content
+      } else {
+        alert('Upload failed.');
+      }
+    })
+    .catch(error => {
+      console.error('Error uploading file:', error);
+      alert('An error occurred.');
+    });
+}
+

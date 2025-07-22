@@ -70,6 +70,102 @@
     </main>
   </div>
 
+  <!-- Classroom View Modal -->
+  <div class="modal-overlay" id="classroomViewModal">
+    <div class="modal-content large">
+      <div class="modal-header">
+        <h2 class="modal-title" id="classroomTitle">Classroom Name</h2>
+        <button class="modal-close" onclick="closeClassroomView()">&times;</button>
+      </div>
+      
+      <div class="classroom-view-content">
+        <div class="classroom-tabs">
+          <button class="classroom-tab active" data-tab="overview">Overview</button>
+          <button class="classroom-tab" data-tab="resources">Resources</button>
+          <button class="classroom-tab" data-tab="members">Members</button>
+        </div>
+        
+        <div class="classroom-tab-content">
+          <!-- Overview Tab -->
+          <div class="tab-panel active" id="overview">
+            <div class="classroom-info">
+              <h3>Classroom Information</h3>
+              <div class="info-grid">
+                <div class="info-item">
+                  <span class="info-label">Subject:</span>
+                  <span class="info-value" id="classroomSubject">-</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Created:</span>
+                  <span class="info-value" id="classroomCreated">-</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Members:</span>
+                  <span class="info-value" id="classroomMemberCount">-</span>
+                </div>
+                <div class="info-item">
+                  <span class="info-label">Role:</span>
+                  <span class="info-value" id="classroomRole">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Resources Tab -->
+          <div class="tab-panel" id="resources">
+            <div class="resources-section">
+              <div class="upload-section">
+                <h3>Upload Resources</h3>
+                <form class="upload-form" id="resourceUploadForm">
+                  <div class="upload-area" id="uploadArea">
+                    <div class="upload-content">
+                      <div class="upload-icon">📁</div>
+                      <h4>Drop files here or click to browse</h4>
+                      <p>Supported formats: PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, TXT</p>
+                      <input type="file" id="resourceFile" multiple accept=".pdf,.doc,.docx,.ppt,.pptx,.xls,.xlsx,.txt" style="display: none;">
+                    </div>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="resourceTitle">Resource Title</label>
+                    <input type="text" id="resourceTitle" placeholder="Enter resource title" required>
+                  </div>
+                  
+                  <div class="form-group">
+                    <label for="resourceDescription">Description (Optional)</label>
+                    <textarea id="resourceDescription" rows="3" placeholder="Brief description of the resource"></textarea>
+                  </div>
+                  
+                  <button type="submit" class="btn-primary">
+                    <span class="btn-icon">📤</span>
+                    Upload Resource
+                  </button>
+                </form>
+              </div>
+              
+              <div class="resources-list">
+                <h3>Available Resources</h3>
+                <div class="resources-grid" id="resourcesGrid">
+                  <!-- Resources will be populated by JavaScript -->
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Members Tab -->
+          <div class="tab-panel" id="members">
+            <div class="members-section">
+              <h3>Classroom Members</h3>
+              <div class="members-list" id="membersList">
+                <!-- Members will be populated by JavaScript -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script src="../common/sidebar.js"></script>
   <script src="classroom.js"></script>
 </body>

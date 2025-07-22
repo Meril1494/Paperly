@@ -65,8 +65,19 @@
 </div>
 
 <div id="resources" class="section" style="display: none;">
-  <p>Resources section coming soon...</p>
+  <!-- 📁 Upload Form -->
+  <form id="resource-form">
+  <input type="hidden" id="classroom-id" value="YOUR_ACTUAL_CLASSROOM_ID" />
+  <input type="text" id="resource-title" placeholder="Enter resource title" required />
+  <input type="file" id="resource-file" name="file" required />
+  <button type="submit">Upload Resource</button>
+</form>
+
+
+  <!-- 📄 Uploaded Resources List -->
+  <div id="resource-list"></div>
 </div>
+
 <!-- 🔺 End of Tabs & Sections -->
 
             <!-- Document Sharing Section -->
