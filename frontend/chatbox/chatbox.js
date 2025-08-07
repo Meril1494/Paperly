@@ -1,3 +1,8 @@
+if (typeof socket === "undefined") {
+  var socket = io();
+}
+
+
 class ChatboxManager {
     constructor() {
         this.currentChat = null;
@@ -297,6 +302,12 @@ class ChatboxManager {
     sendMessage() {
         const messageInput = document.getElementById('messageInput');
         const messageText = messageInput.value.trim();
+    
+    socket.emit("chatMessage", {
+    roomId: currentRoomId,
+    message: messageText
+    });
+
         
         if (!messageText || !this.currentChat) return;
 
@@ -556,3 +567,67 @@ style.textContent = `
     }
 `;
 document.head.appendChild(style);
+// ==========================
+// New Code for Real-Time Chat (Socket.IO)
+// ==========================
+
+// Get classroom ID from URL (or use 'default' if not found)
+const currentRoomId = new URLSearchParams(window.location.search).get("id") || "default";
+
+// Connect to Socket.IO server
+const socket = io('http://localhost:5000');
+
+const roomId = 'global';
+
+socket.on('connect', () => {
+  console.log('✅ Connected to Socket.IO server');
+  socket.emit('joinRoom', roomId);
+});
+
+socket.on('disconnect', () => {
+  console.log('❌ Disconnected from Socket.IO server');
+});
+
+socket.on('connect_error', (err) => {
+  console.error('❗ Connection error:', err.message);
+});
+
+
+// Join the room
+socket.emit("joinRoom", currentRoomId);
+
+function sendMessage() {
+  const messageInput = document.getElementById('messageInput');
+  const messageText = messageInput.value.trim();
+
+  if (messageText) {
+    socket.emit('chatMessage', {
+      roomId: roomId,
+      message: messageText,
+      sender: 'You'
+    });
+
+    // Show sent message immediately
+    appendMessage('You', messageText);
+    messageInput.value = '';
+  }
+}
+
+socket.on('chatMessage', (data) => {
+  appendMessage(data.sender || 'Anonymous', data.message);
+});
+
+function appendMessage(sender, message) {
+  const messages = document.getElementById('messages');
+  const li = document.createElement('li');
+  li.textContent = `${sender}: ${message}`;
+  messages.appendChild(li);
+}
+
+
+// Receive and display message from others
+socket.on("chatMessage", (data) => {
+    if (data.sender !== socket.id) {
+        appendMessage("User", data.message);
+    }
+});

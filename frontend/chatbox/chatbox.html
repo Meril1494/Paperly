@@ -77,6 +77,12 @@
     </div>
 
     <script src="../common/sidebar.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
     <script src="chatbox.js"></script>
 </body>
+<div id="chat" style="margin-top: 20px;">
+  <ul id="messages" style="list-style-type: none; padding: 0;"></ul>
+  <input id="messageInput" placeholder="Type a message..." autocomplete="off" />
+  <button onclick="sendMessage()">Send</button>
+</div>
 </html>
