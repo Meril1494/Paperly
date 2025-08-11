@@ -1,88 +1,113 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Paperly - Chatbox</title>
-    <link rel="stylesheet" href="../common/sidebar.css">
-    <link rel="stylesheet" href="chatbox.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Paperly - Chatbox</title>
+  <link rel="stylesheet" href="../common/sidebar.css">
+  <link rel="stylesheet" href="chatbox.css">
 </head>
 <body>
-    <div class="main-content">
-        <div class="chat-container">
-            <!-- Chat Sidebar -->
-            <div class="chat-sidebar">
-                <div class="chat-header">
-                    <h2 class="chat-title">Messages</h2>
-                    <button class="new-chat-btn" onclick="openNewChatModal()">
-                        <span class="btn-icon">💬</span>
-                    </button>
-                </div>
-                
-                <div class="chat-search">
-                    <input type="text" id="chatSearch" placeholder="Search conversations...">
-                </div>
-                
-                <div class="chat-tabs">
-                    <button class="chat-tab active" data-tab="direct">Direct</button>
-                    <button class="chat-tab" data-tab="groups">Groups</button>
-                </div>
-                
-                <div class="chat-list" id="chatList">
-                    <!-- Chat items will be populated by JavaScript -->
-                </div>
-            </div>
-            
-            <!-- Chat Main Area -->
-            <div class="chat-main">
-                <div class="chat-area" id="chatArea">
-                    <div class="chat-welcome">
-                        <div class="welcome-icon">💬</div>
-                        <h3 class="welcome-title">Welcome to Paperly Chat</h3>
-                        <p class="welcome-subtitle">Select a conversation to start messaging</p>
-                    </div>
-                </div>
-                
-                <div class="chat-input-area" id="chatInputArea" style="display: none;">
-                    <div class="chat-input-container">
-                        <button class="attachment-btn" onclick="attachFile()">📎</button>
-                        <input type="text" id="messageInput" placeholder="Type a message...">
-                        <button class="send-btn" onclick="sendMessage()">
-                            <span class="send-icon">➤</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
+  <div class="main-content">
+    <div class="chat-container">
+      <!-- Chat Sidebar -->
+      <div class="chat-sidebar">
+        <div class="chat-header">
+          <h2 class="chat-title">Messages</h2>
+          <button class="new-chat-btn" onclick="openNewChatModal()">
+            <span class="btn-icon">💬</span>
+          </button>
         </div>
-    </div>
 
-    <!-- New Chat Modal -->
-    <div class="modal-overlay" id="newChatModal">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2 class="modal-title">Start New Chat</h2>
-                <button class="modal-close" onclick="closeNewChatModal()">&times;</button>
-            </div>
-            
-            <div class="new-chat-content">
-                <div class="search-users">
-                    <input type="text" id="userSearch" placeholder="Search users...">
-                </div>
-                
-                <div class="users-list" id="usersList">
-                    <!-- Users will be populated by JavaScript -->
-                </div>
-            </div>
+        <div class="chat-search">
+          <input type="text" id="chatSearch" placeholder="Search conversations...">
         </div>
-    </div>
 
-    <script src="../common/sidebar.js"></script>
-    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-    <script src="chatbox.js"></script>
+        <div class="chat-tabs">
+          <button class="chat-tab active" data-tab="direct">Direct</button>
+          <button class="chat-tab" data-tab="groups">Groups</button>
+        </div>
+
+        <div class="chat-list" id="chatList">
+          <!-- Chat items will be populated by JavaScript -->
+        </div>
+      </div>
+
+      <!-- Chat Main Area -->
+      <div class="chat-main">
+        <div class="chat-area" id="chatArea">
+          <!-- Messages will go here -->
+          <div id="messages" style="padding: 20px; max-height: 500px; overflow-y: auto;"></div>
+          
+          <!-- Message Input -->
+          <div class="message-input" style="padding: 10px; border-top: 1px solid #ddd;">
+            <input type="text" id="messageInput" placeholder="Type a message..." style="width: 80%; padding: 10px;" />
+            <button onclick="sendMessage()" style="padding: 10px 20px;">Send</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- New Chat Modal -->
+  <div class="modal-overlay" id="newChatModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">Start New Chat</h2>
+        <button class="modal-close" onclick="closeNewChatModal()">&times;</button>
+      </div>
+
+      <div class="new-chat-content">
+        <div class="search-users">
+          <input type="text" id="userSearch" placeholder="Search users...">
+        </div>
+
+        <div class="users-list" id="usersList">
+          <!-- Users will be populated by JavaScript -->
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="../common/sidebar.js"></script>
+  <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+
+  <script>
+    const socket = io('http://localhost:5000'); // Adjust the port if needed
+
+    const messagesContainer = document.getElementById('messages');
+    const messageInput = document.getElementById('messageInput');
+
+    socket.on('connect', () => {
+      console.log('✅ Connected to Socket.IO server');
+    });
+
+    socket.on('chat message', (msg) => {
+      const div = document.createElement('div');
+      div.innerText = msg;
+      div.style.marginBottom = '10px';
+      div.style.padding = '10px';
+      div.style.background = '#f1f1f1';
+      div.style.borderRadius = '6px';
+      messagesContainer.appendChild(div);
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    });
+
+    function sendMessage() {
+      const msg = messageInput.value;
+      if (msg.trim() !== '') {
+        socket.emit('chat message', msg);
+        messageInput.value = '';
+      }
+    }
+
+    function openNewChatModal() {
+      document.getElementById('newChatModal').style.display = 'block';
+    }
+
+    function closeNewChatModal() {
+      document.getElementById('newChatModal').style.display = 'none';
+    }
+  </script>
 </body>
-<div id="chat" style="margin-top: 20px;">
-  <ul id="messages" style="list-style-type: none; padding: 0;"></ul>
-  <input id="messageInput" placeholder="Type a message..." autocomplete="off" />
-  <button onclick="sendMessage()">Send</button>
-</div>
 </html>

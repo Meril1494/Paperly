@@ -173,50 +173,68 @@ function handleFileDrop(event) {
 
 // Upload document function
 function uploadDocument(file) {
-    // Validate file type
-    const allowedTypes = [
-        'application/pdf',
-        'application/msword',
-        'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
-        'application/vnd.ms-powerpoint',
-        'application/vnd.openxmlformats-officedocument.presentationml.presentation',
-        'application/vnd.ms-excel',
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        'text/plain'
-    ];
-    
-    if (!allowedTypes.includes(file.type)) {
-        showNotification('File type not supported. Please upload PDF, DOC, DOCX, PPT, PPTX, XLS, XLSX, or TXT files.', 'error');
-        return;
-    }
-    
-    // Validate file size (max 50MB)
-    const maxSize = 50 * 1024 * 1024; // 50MB in bytes
-    if (file.size > maxSize) {
-        showNotification('File size too large. Maximum size is 50MB.', 'error');
-        return;
-    }
-    
-    // Create new document object
-    const newDocument = {
-        id: documents.length + 1,
-        name: file.name.replace(/\.[^/.]+$/, ""), // Remove extension
-        type: getFileType(file.type),
-        size: formatFileSize(file.size),
-        uploadedBy: "You", // In a real app, this would be the current user
-        uploadTime: "Just now",
-        filename: file.name
-    };
-    
-    // Add to documents array
-    documents.unshift(newDocument); // Add to beginning of array
-    
-    // Update the documents list in the UI
-    updateDocumentsList();
-    
-    showNotification(`Document "${file.name}" uploaded successfully!`, 'success');
-    
-    console.log(`Document uploaded: ${file.name} (${formatFileSize(file.size)})`);
+  const allowedTypes = [
+  'application/pdf',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-powerpoint',
+  'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+  'text/plain'
+];
+
+  const maxSize = 50 * 1024 * 1024;
+
+  if (!allowedTypes.includes(file.type)) {
+    showNotification('File type not supported.', 'error');
+    return;
+  }
+
+  if (file.size > maxSize) {
+    showNotification('File size too large.', 'error');
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('title', file.name.replace(/\.[^/.]+$/, ""));
+  formData.append('type', 'resource');
+  formData.append('classroomId', classroomId);
+
+  fetch(`/api/files/upload/${classroomId}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`
+    },
+    body: formData
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.message === 'File uploaded successfully') {
+        showNotification(`Document "${file.name}" uploaded successfully!`, 'success');
+
+        // Update the UI
+        const newDocument = {
+          id: documents.length + 1,
+          name: file.name.replace(/\.[^/.]+$/, ""),
+          type: getFileType(file.type),
+          size: formatFileSize(file.size),
+          uploadedBy: "You",
+          uploadTime: "Just now",
+          filename: file.name
+        };
+
+        documents.unshift(newDocument);
+        updateDocumentsList();
+      } else {
+        showNotification('Upload failed.', 'error');
+      }
+    })
+    .catch(error => {
+      console.error('Error uploading document:', error);
+      showNotification('An error occurred.', 'error');
+    });
 }
 
 // Update documents list in UI

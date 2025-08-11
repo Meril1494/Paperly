@@ -5,6 +5,7 @@ const authRoutes = require('./routes/authRoutes');
 const fileRoutes = require('./routes/fileRoutes');
 const classroomRoutes = require('./routes/classroomRoutes');
 const postRoutes = require('./routes/postRoutes');
+const groupRoutes = require('./routes/groupRoutes');
 const path = require('path');
 const cors = require('cors');
 const fs = require('fs');
@@ -35,6 +36,7 @@ const io = new Server(server, {
 app.use(cors());
 app.use(express.json());
 app.use('/api/posts', postRoutes);
+app.use('/api/groups', groupRoutes);
 
 // Ensure uploads directory exists
 const uploadsDir = path.join(__dirname, 'uploads');

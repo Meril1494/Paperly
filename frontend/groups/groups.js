@@ -273,25 +273,41 @@ class GroupsManager {
         }
     }
 
-    createGroup() {
-        const name = document.getElementById('groupName').value;
-        const description = document.getElementById('groupDescription').value;
-        const subject = document.getElementById('groupSubject').value;
-        const privacy = document.getElementById('groupPrivacy').value;
+    async createGroup() {
+    const name = document.getElementById('groupName').value;
+    const description = document.getElementById('groupDescription').value;
+    const subject = document.getElementById('groupSubject').value;
+    const privacy = document.getElementById('groupPrivacy').value;
 
-        if (!name.trim() || !subject) {
-            alert('Please fill in all required fields');
-            return;
-        }
+    if (!name.trim() || !subject) {
+        alert('Please fill in all required fields');
+        return;
+    }
 
+    try {
+        const token = localStorage.getItem('token'); // assuming you store auth token this way
+        const response = await fetch('http://localhost:5000/api/groups/create', {
+
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                name,
+                description,
+                subject,
+                isPrivate: privacy === 'private'
+            })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) throw new Error(data.error || 'Failed to create group');
+
+        // Update UI with new group
         const newGroup = {
-            id: Date.now(),
-            name: name.trim(),
-            subject,
-            description: description.trim(),
-            members: 1,
-            notes: 0,
-            privacy,
+            ...data.group,
             role: 'admin',
             avatar: name.substring(0, 2).toUpperCase(),
             joinDate: new Date().toISOString().split('T')[0]
@@ -301,9 +317,14 @@ class GroupsManager {
         this.saveMyGroups();
         this.renderMyGroups();
         this.closeCreateModal();
-        
         this.showMessage('Group created successfully!', 'success');
+
+    } catch (err) {
+        console.error('Error creating group:', err);
+        this.showMessage('Failed to create group. Please try again.', 'error');
     }
+}
+
 
     joinGroup() {
         const groupCode = document.getElementById('groupCode').value;
