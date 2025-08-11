@@ -575,7 +575,7 @@ document.head.appendChild(style);
 const currentRoomId = new URLSearchParams(window.location.search).get("id") || "default";
 
 // Connect to Socket.IO server
-const socket = io('http://localhost:5000');
+const socket = io('http://localhost:5002');
 
 const roomId = 'global';
 

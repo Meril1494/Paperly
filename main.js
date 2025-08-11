@@ -2,7 +2,7 @@ import { io } from 'socket.io-client';
 import './style.css';
 
 // Connect to backend server
-const socket = io('http://localhost:5000'); // Make sure backend is running on port 5000
+const socket = io('http://localhost:5002'); // Make sure backend is running on port 5002
 const roomId = 'global';
 
 document.querySelector('#app').innerHTML = `

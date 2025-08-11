@@ -121,7 +121,7 @@ class ClassroomManager {
         submitBtn.disabled = true;
 
         try {
-            const res = await fetch("http://localhost:5000/api/classrooms/create", {
+            const res = await fetch("http://localhost:5002/api/classrooms/create", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -183,7 +183,7 @@ class ClassroomManager {
         submitBtn.disabled = true;
 
         try {
-            const res = await fetch("http://localhost:5000/api/classrooms/join", {
+            const res = await fetch("http://localhost:5002/api/classrooms/join", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
