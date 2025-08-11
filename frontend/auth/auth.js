@@ -78,7 +78,7 @@ class AuthManager {
         const password = formData.get('password'); // was: formData.get('login-password')
         const role = document.getElementById('login-role-toggle').checked ? 'teacher' : 'student'; // unchanged
 
-        fetch('http://localhost:5000/api/auth/login', {
+        fetch('http://localhost:5002/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ email, password, role }) // unchanged
@@ -112,7 +112,7 @@ class AuthManager {
             return;
         }
 
-        fetch('http://localhost:5000/api/auth/register', {
+        fetch('http://localhost:5002/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ name, email, password, role })
