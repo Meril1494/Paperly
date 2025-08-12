@@ -404,14 +404,14 @@ class ClassroomManager {
 
     renderMembers() {
         const membersList = document.getElementById('membersList');
-        const mockMembers = [
+        const members = this.currentClassroom && this.currentClassroom.members ? this.currentClassroom.members : [
             { name: 'John Doe', role: 'Teacher', avatar: 'JD' },
             { name: 'Alice Johnson', role: 'Student', avatar: 'AJ' },
             { name: 'Bob Smith', role: 'Student', avatar: 'BS' },
             { name: 'Carol Davis', role: 'Student', avatar: 'CD' }
         ];
 
-        membersList.innerHTML = mockMembers.map(member => `
+        membersList.innerHTML = members.map(member => `
             <div class="member-item">
                 <div class="member-avatar">${member.avatar}</div>
                 <div class="member-info">
@@ -435,14 +435,24 @@ class ClassroomManager {
                 name: 'Advanced Physics',
                 subject: 'Physics',
                 role: 'student',
-                joinedAt: new Date(Date.now() - 86400000).toISOString()
+                joinedAt: new Date(Date.now() - 86400000).toISOString(),
+                members: [
+                    { name: 'John Doe', role: 'Teacher', avatar: 'JD' },
+                    { name: 'Alice Johnson', role: 'Student', avatar: 'AJ' },
+                    { name: 'Bob Smith', role: 'Student', avatar: 'BS' },
+                    { name: 'Carol Davis', role: 'Student', avatar: 'CD' }
+                ]
             },
             {
                 id: 2,
                 name: 'Mathematics 101',
                 subject: 'Mathematics',
                 role: 'teacher',
-                joinedAt: new Date(Date.now() - 172800000).toISOString()
+                joinedAt: new Date(Date.now() - 172800000).toISOString(),
+                members: [
+                    { name: 'Eve Turner', role: 'Teacher', avatar: 'ET' },
+                    { name: 'Frank Mills', role: 'Student', avatar: 'FM' }
+                ]
             }
         ];
     }
@@ -548,7 +558,8 @@ class ClassroomManager {
             document.getElementById('classroomTitle').textContent = classroom.name;
             document.getElementById('classroomSubject').textContent = classroom.subject;
             document.getElementById('classroomCreated').textContent = this.formatDate(classroom.joinedAt);
-            document.getElementById('classroomMemberCount').textContent = '4 members';
+            const memberCount = classroom.members ? classroom.members.length : 0;
+            document.getElementById('classroomMemberCount').textContent = `${memberCount} members`;
             document.getElementById('classroomRole').textContent = classroom.role;
             
             // Show modal
