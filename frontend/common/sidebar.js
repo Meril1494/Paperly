@@ -32,10 +32,6 @@ class Sidebar {
                         <span class="nav-icon">📝</span>
                         <span class="nav-text">Notes</span>
                     </a>
-                    <a href="../groups/groups.html" class="nav-item" data-page="groups">
-                        <span class="nav-icon">👥</span>
-                        <span class="nav-text">Groups</span>
-                    </a>
                     <a href="../chatbox/chatbox.html" class="nav-item" data-page="chatbox">
                         <span class="nav-icon">💬</span>
                         <span class="nav-text">Chatbox</span>

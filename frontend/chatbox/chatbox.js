@@ -16,7 +16,6 @@ class ChatboxManager {
     init() {
         this.renderChatList();
         this.initEventListeners();
-        this.checkUrlParams();
     }
 
     initEventListeners() {
@@ -47,16 +46,6 @@ class ChatboxManager {
         });
     }
 
-    checkUrlParams() {
-        const urlParams = new URLSearchParams(window.location.search);
-        const groupId = urlParams.get('group');
-        
-        if (groupId) {
-            // Open group chat
-            this.openGroupChat(parseInt(groupId));
-        }
-    }
-
     loadChats() {
         const savedChats = localStorage.getItem('paperly_chats');
         if (savedChats) {
@@ -83,26 +72,6 @@ class ChatboxManager {
                 lastMessageTime: '1 hour ago',
                 unreadCount: 0,
                 isOnline: false
-            },
-            {
-                id: 101,
-                name: 'Advanced Physics',
-                avatar: 'AP',
-                type: 'group',
-                lastMessage: 'Prof. Johnson: Assignment due tomorrow',
-                lastMessageTime: '30 min ago',
-                unreadCount: 5,
-                members: 24
-            },
-            {
-                id: 102,
-                name: 'Calculus Study Group',
-                avatar: 'CS',
-                type: 'group',
-                lastMessage: 'Anyone need help with integration?',
-                lastMessageTime: '2 hours ago',
-                unreadCount: 1,
-                members: 18
             }
         ];
     }
@@ -128,11 +97,6 @@ class ChatboxManager {
             2: [
                 { id: 5, sender: 'Bob Smith', senderAvatar: 'BS', text: 'Thanks for sharing those notes!', time: '1:00 PM', isOwn: false },
                 { id: 6, sender: 'You', senderAvatar: 'YO', text: 'No problem! Happy to help.', time: '1:15 PM', isOwn: true }
-            ],
-            101: [
-                { id: 7, sender: 'Prof. Johnson', senderAvatar: 'PJ', text: 'Don\'t forget the assignment is due tomorrow!', time: '11:30 AM', isOwn: false },
-                { id: 8, sender: 'Alice Johnson', senderAvatar: 'AJ', text: 'Thanks for the reminder, professor!', time: '11:35 AM', isOwn: false },
-                { id: 9, sender: 'You', senderAvatar: 'YO', text: 'I\'ll submit it by tonight.', time: '11:40 AM', isOwn: true }
             ]
         };
     }
@@ -156,12 +120,12 @@ class ChatboxManager {
     renderChatList() {
         const chatList = document.getElementById('chatList');
         const filteredChats = this.chats.filter(chat => chat.type === this.currentTab);
-        
+
         if (filteredChats.length === 0) {
             chatList.innerHTML = `
                 <div class="empty-chat-list">
-                    <div class="empty-icon">${this.currentTab === 'direct' ? '💬' : '👥'}</div>
-                    <div class="empty-text">No ${this.currentTab === 'direct' ? 'direct messages' : 'group chats'} yet</div>
+                    <div class="empty-icon">💬</div>
+                    <div class="empty-text">No messages yet</div>
                 </div>
             `;
             return;
@@ -173,8 +137,7 @@ class ChatboxManager {
 
     createChatItem(chat) {
         const unreadBadge = chat.unreadCount > 0 ? `<span class="chat-unread">${chat.unreadCount}</span>` : '';
-        const statusInfo = chat.type === 'group' ? `${chat.members} members` : 
-                          chat.isOnline ? 'Online' : 'Offline';
+        const statusInfo = chat.isOnline ? 'Online' : 'Offline';
         
         return `
             <div class="chat-item ${this.currentChat?.id === chat.id ? 'active' : ''}" data-chat-id="${chat.id}">
@@ -217,31 +180,6 @@ class ChatboxManager {
         }
     }
 
-    openGroupChat(groupId) {
-        // Find or create group chat
-        let groupChat = this.chats.find(c => c.id === groupId && c.type === 'group');
-        
-        if (!groupChat) {
-            // Create new group chat
-            groupChat = {
-                id: groupId,
-                name: `Group ${groupId}`,
-                avatar: 'GR',
-                type: 'group',
-                lastMessage: 'Welcome to the group!',
-                lastMessageTime: 'now',
-                unreadCount: 0,
-                members: 1
-            };
-            this.chats.unshift(groupChat);
-            this.saveChats();
-        }
-        
-        // Switch to groups tab and open chat
-        this.switchTab('groups');
-        this.openChat(groupId);
-    }
-
     renderChatArea() {
         const chatArea = document.getElementById('chatArea');
         const chat = this.currentChat;
@@ -257,9 +195,7 @@ class ChatboxManager {
             return;
         }
 
-        const statusText = chat.type === 'group' ? 
-            `${chat.members} members` : 
-            chat.isOnline ? 'Online' : 'Last seen recently';
+        const statusText = chat.isOnline ? 'Online' : 'Last seen recently';
 
         chatArea.innerHTML = `
             <div class="chat-header-active">
