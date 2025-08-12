@@ -6,8 +6,6 @@ const Classroom = require('../models/Classroom');
 const auth = require('../middleware/auth');
 
 // Create a new group
-// Create a new group
-// Create a new group
 router.post('/create', auth, async (req, res) => {
   console.log('Received request to create group:', req.body);
 
@@ -45,6 +43,7 @@ router.post('/create', auth, async (req, res) => {
   }
 });
 
+
 // router.post('/create', auth, async (req, res) => {
 //   console.log('Received request to create group:', req.body); // ✅ Debugging log
 
@@ -76,6 +75,9 @@ router.post('/create', auth, async (req, res) => {
 // });
 
 // Join a group by ID or join code
+
+// Join a group (with or without code)
+
 router.post('/join', auth, async (req, res) => {
   const { groupId, joinCode } = req.body;
   const normalizedCode = joinCode ? joinCode.toUpperCase() : null;

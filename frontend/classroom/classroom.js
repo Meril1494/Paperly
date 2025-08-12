@@ -30,20 +30,12 @@ class ClassroomManager {
         });
 
         // Resource upload form
-       document.addEventListener('DOMContentLoaded', () => {
-    const resourceForm = document.getElementById('resourceUploadForm');
-
-    if (resourceForm) {
-        resourceForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const manager = new ClassroomManager(); // ✅ create instance
-            manager.handleResourceUpload(e);        // ✅ call instance method
-        });
-
-    } else {
-        console.error('resourceUploadForm not found in DOM.');
-    }
-});
+        const resourceForm = document.getElementById('resourceUploadForm');
+        if (resourceForm) {
+            resourceForm.addEventListener('submit', this.handleResourceUpload.bind(this));
+        } else {
+            console.error('resourceUploadForm not found in DOM.');
+        }
 
         document.getElementById('deleteClassroomBtn').addEventListener('click', () => {
             this.deleteCurrentClassroom();
@@ -227,6 +219,7 @@ class ClassroomManager {
     }
 
     async handleResourceUpload(e) {
+        e.preventDefault();
         const fileInput = document.getElementById('resourceFile');
         const title = document.getElementById('resourceTitle').value.trim();
         const description = document.getElementById('resourceDescription').value.trim();
@@ -409,14 +402,14 @@ class ClassroomManager {
 
     renderMembers() {
         const membersList = document.getElementById('membersList');
-        const mockMembers = [
+        const members = this.currentClassroom && this.currentClassroom.members ? this.currentClassroom.members : [
             { name: 'John Doe', role: 'Teacher', avatar: 'JD' },
             { name: 'Alice Johnson', role: 'Student', avatar: 'AJ' },
             { name: 'Bob Smith', role: 'Student', avatar: 'BS' },
             { name: 'Carol Davis', role: 'Student', avatar: 'CD' }
         ];
 
-        membersList.innerHTML = mockMembers.map(member => `
+        membersList.innerHTML = members.map(member => `
             <div class="member-item">
                 <div class="member-avatar">${member.avatar}</div>
                 <div class="member-info">
@@ -441,7 +434,16 @@ class ClassroomManager {
                 subject: 'Physics',
                 role: 'student',
                 joinedAt: new Date(Date.now() - 86400000).toISOString(),
+
                 code: 'ABC123'
+
+                members: [
+                    { name: 'John Doe', role: 'Teacher', avatar: 'JD' },
+                    { name: 'Alice Johnson', role: 'Student', avatar: 'AJ' },
+                    { name: 'Bob Smith', role: 'Student', avatar: 'BS' },
+                    { name: 'Carol Davis', role: 'Student', avatar: 'CD' }
+                ]
+
             },
             {
                 id: 2,
@@ -449,7 +451,14 @@ class ClassroomManager {
                 subject: 'Mathematics',
                 role: 'teacher',
                 joinedAt: new Date(Date.now() - 172800000).toISOString(),
+
                 code: 'XYZ789'
+
+                members: [
+                    { name: 'Eve Turner', role: 'Teacher', avatar: 'ET' },
+                    { name: 'Frank Mills', role: 'Student', avatar: 'FM' }
+                ]
+
             }
         ];
     }
@@ -556,7 +565,13 @@ class ClassroomManager {
             // Populate classroom info
             document.getElementById('classroomTitle').textContent = classroom.name;
             document.getElementById('classroomSubject').textContent = classroom.subject;
+
             document.getElementById('classroomMemberCount').textContent = '4 members';
+
+            document.getElementById('classroomCreated').textContent = this.formatDate(classroom.joinedAt);
+            const memberCount = classroom.members ? classroom.members.length : 0;
+            document.getElementById('classroomMemberCount').textContent = `${memberCount} members`;
+
             document.getElementById('classroomRole').textContent = classroom.role;
             document.getElementById('classroomCode').textContent = classroom.code || '-';
             const deleteBtn = document.getElementById('deleteClassroomBtn');
