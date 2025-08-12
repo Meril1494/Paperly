@@ -274,58 +274,124 @@ class GroupsManager {
     }
 
 async createGroup() {
-    const name = document.getElementById('groupName').value;
-    const description = document.getElementById('groupDescription').value;
-    const subject = document.getElementById('groupSubject').value;
-    const privacy = document.getElementById('groupPrivacy').value;
+  const name = document.getElementById('groupName').value;
+  const description = document.getElementById('groupDescription').value;
+  const privacy = document.getElementById('groupPrivacy').value; // "public" | "private"
 
-    if (!name.trim() || !subject) {
-        alert('Please fill in all required fields');
+  if (!name.trim()) {
+    alert('Please enter a group name');
+    return;
+  }
+
+  try {
+    const token = localStorage.getItem('token');
+    let classroomId = localStorage.getItem('selectedClassroomId');
+
+    // Fallback: try to pick the first classroom the user belongs to
+    if (!classroomId) {
+      const resp = await fetch('http://localhost:5002/api/classrooms/my', {
+        method: 'GET',
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      const clsData = await resp.json();
+
+      if (!resp.ok || !clsData.classrooms || !clsData.classrooms.length) {
+        alert('Please create or join a classroom first, then create a group.');
         return;
+      }
+
+      classroomId = clsData.classrooms[0]._id;
+      localStorage.setItem('selectedClassroomId', classroomId);
     }
 
-    try {
-        const token = localStorage.getItem('token');
-        const classroomId = localStorage.getItem('selectedClassroomId'); // 👈 Required
+    const response = await fetch('http://localhost:5002/api/groups/create', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify({
+        name: name,
+        classroomId: classroomId,
+        description: description,
+        groupType: privacy === 'private' ? 'private' : 'public'
+      })
+    });
 
-        const response = await fetch('http://localhost:5002/api/groups/create', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify({
-                name: name, 
-                classroomId: classroomId, 
-                description: description,
-                groupType: privacy === 'private' ? 'private' : 'public',
-                
-                
-            })
-        });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || data.message || 'Failed to create group');
 
-        const data = await response.json();
+    const newGroup = {
+      ...data.group,
+      role: 'admin',
+      avatar: name.substring(0, 2).toUpperCase(),
+      joinDate: new Date().toISOString().split('T')[0],
+    };
 
-        if (!response.ok) throw new Error(data.error || 'Failed to create group');
-
-        const newGroup = {
-            ...data.group,
-            role: 'admin',
-            avatar: name.substring(0, 2).toUpperCase(),
-            joinDate: new Date().toISOString().split('T')[0]
-        };
-
-        this.myGroups.unshift(newGroup);
-        this.saveMyGroups();
-        this.renderMyGroups();
-        this.closeCreateModal();
-        this.showMessage('Group created successfully!', 'success');
-
-    } catch (err) {
-        console.error('Error creating group:', err);
-        this.showMessage('Failed to create group. Please try again.', 'error');
-    }
+    this.myGroups.unshift(newGroup);
+    this.saveMyGroups();
+    this.renderMyGroups();
+    this.closeCreateModal();
+    this.showMessage('Group created successfully!');
+  } catch (err) {
+    console.error(err);
+    alert(err.message || 'Failed to create group');
+  }
 }
+
+// async createGroup() {
+//     const name = document.getElementById('groupName').value;
+//     const description = document.getElementById('groupDescription').value;
+//     const subject = document.getElementById('groupSubject').value;
+//     const privacy = document.getElementById('groupPrivacy').value;
+
+//     if (!name.trim() || !subject) {
+//         alert('Please fill in all required fields');
+//         return;
+//     }
+
+//     try {
+//         const token = localStorage.getItem('token');
+//         const classroomId = localStorage.getItem('selectedClassroomId'); // 👈 Required
+
+//         const response = await fetch('http://localhost:5002/api/groups/create', {
+//             method: 'POST',
+//             headers: {
+//                 'Content-Type': 'application/json',
+//                 'Authorization': `Bearer ${token}`
+//             },
+//             body: JSON.stringify({
+//                 name: name, 
+//                 classroomId: classroomId, 
+//                 description: description,
+//                 groupType: privacy === 'private' ? 'private' : 'public',
+                
+                
+//             })
+//         });
+
+//         const data = await response.json();
+
+//         if (!response.ok) throw new Error(data.error || 'Failed to create group');
+
+//         const newGroup = {
+//             ...data.group,
+//             role: 'admin',
+//             avatar: name.substring(0, 2).toUpperCase(),
+//             joinDate: new Date().toISOString().split('T')[0]
+//         };
+
+//         this.myGroups.unshift(newGroup);
+//         this.saveMyGroups();
+//         this.renderMyGroups();
+//         this.closeCreateModal();
+//         this.showMessage('Group created successfully!', 'success');
+
+//     } catch (err) {
+//         console.error('Error creating group:', err);
+//         this.showMessage('Failed to create group. Please try again.', 'error');
+//     }
+// }
 
 
     joinGroup() {
