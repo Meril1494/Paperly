@@ -79,7 +79,6 @@ class SettingsManager {
             theme: 'light',
             notifications: {
                 emailMessages: true,
-                emailGroups: true,
                 emailNotes: true,
                 browserNotifications: false
             },
@@ -324,7 +323,6 @@ class SettingsManager {
                 notes: JSON.parse(localStorage.getItem('paperly_notes') || '[]'),
                 chats: JSON.parse(localStorage.getItem('paperly_chats') || '[]'),
                 messages: JSON.parse(localStorage.getItem('paperly_messages') || '{}'),
-                groups: JSON.parse(localStorage.getItem('paperly_my_groups') || '[]'),
                 aiHistory: JSON.parse(localStorage.getItem('paperly_ai_history') || '[]'),
                 settings: this.settings,
                 exportDate: new Date().toISOString()
