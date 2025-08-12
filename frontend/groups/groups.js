@@ -424,20 +424,38 @@ async createGroup() {
         this.showMessage('Successfully joined group!', 'success');
     }
 
-    joinGroupById(groupId) {
-        const group = this.discoverGroups.find(g => g.id === groupId);
-        if (group) {
+    async joinGroupById(groupIdOrCode) {
+        try {
+            const payload = isNaN(Number(groupIdOrCode))
+                ? { joinCode: groupIdOrCode }
+                : { groupId: groupIdOrCode };
+
+            const response = await fetch('/api/groups/join', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to join group');
+            }
+
+            const group = await response.json();
             const newGroup = {
                 ...group,
                 role: 'member',
                 joinDate: new Date().toISOString().split('T')[0]
             };
-            
+
             this.myGroups.unshift(newGroup);
             this.saveMyGroups();
             this.renderMyGroups();
-            
+
             this.showMessage(`Successfully joined ${group.name}!`, 'success');
+        } catch (err) {
+            console.error('Error joining group:', err);
+            this.showMessage(err.message || 'Invalid group code. Please try again.', 'error');
         }
     }
 
