@@ -273,7 +273,7 @@ class GroupsManager {
         }
     }
 
-    async createGroup() {
+async createGroup() {
     const name = document.getElementById('groupName').value;
     const description = document.getElementById('groupDescription').value;
     const subject = document.getElementById('groupSubject').value;
@@ -285,19 +285,22 @@ class GroupsManager {
     }
 
     try {
-        const token = localStorage.getItem('token'); // assuming you store auth token this way
-        const response = await fetch('http://localhost:5000/api/groups/create', {
+        const token = localStorage.getItem('token');
+        const classroomId = localStorage.getItem('selectedClassroomId'); // 👈 Required
 
+        const response = await fetch('http://localhost:5002/api/groups/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-                name,
-                description,
-                subject,
-                isPrivate: privacy === 'private'
+                name: name, 
+                classroomId: classroomId, 
+                description: description,
+                groupType: privacy === 'private' ? 'private' : 'public',
+                
+                
             })
         });
 
@@ -305,7 +308,6 @@ class GroupsManager {
 
         if (!response.ok) throw new Error(data.error || 'Failed to create group');
 
-        // Update UI with new group
         const newGroup = {
             ...data.group,
             role: 'admin',

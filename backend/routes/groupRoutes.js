@@ -10,7 +10,7 @@ const auth = require('../middleware/auth');
 router.post('/create', auth, async (req, res) => {
   console.log('Received request to create group:', req.body); // ✅ Debugging log
 
-  const { classroomId, name, description, isPrivate } = req.body;
+  const { classroomId, name, description, isPrivate, groupType } = req.body;
   let joinCode = null;
 
   try {
@@ -19,11 +19,12 @@ router.post('/create', auth, async (req, res) => {
     }
 
     const group = new Group({
-      classroom: classroomId,
-      name,
+      classroomId,
+      name: name,
       description,
       isPrivate,
       joinCode,
+      groupType,
       createdBy: req.user._id,
       members: [req.user._id]
     });
