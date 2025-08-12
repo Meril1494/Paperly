@@ -30,20 +30,12 @@ class ClassroomManager {
         });
 
         // Resource upload form
-       document.addEventListener('DOMContentLoaded', () => {
-    const resourceForm = document.getElementById('resourceUploadForm');
-
-    if (resourceForm) {
-        resourceForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const manager = new ClassroomManager(); // ✅ create instance
-            manager.handleResourceUpload(e);        // ✅ call instance method
-        });
-
-    } else {
-        console.error('resourceUploadForm not found in DOM.');
-    }
-});
+        const resourceForm = document.getElementById('resourceUploadForm');
+        if (resourceForm) {
+            resourceForm.addEventListener('submit', this.handleResourceUpload.bind(this));
+        } else {
+            console.error('resourceUploadForm not found in DOM.');
+        }
 
     }
 
@@ -222,6 +214,7 @@ class ClassroomManager {
     }
 
     async handleResourceUpload(e) {
+        e.preventDefault();
         const fileInput = document.getElementById('resourceFile');
         const title = document.getElementById('resourceTitle').value.trim();
         const description = document.getElementById('resourceDescription').value.trim();
