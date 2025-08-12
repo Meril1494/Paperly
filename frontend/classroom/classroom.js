@@ -45,6 +45,9 @@ class ClassroomManager {
     }
 });
 
+        document.getElementById('deleteClassroomBtn').addEventListener('click', () => {
+            this.deleteCurrentClassroom();
+        });
     }
 
     initResourceUpload() {
@@ -141,11 +144,12 @@ class ClassroomManager {
                 
                 // Add to recent classrooms
                 this.addToRecentClassrooms({
-                    id: data.classroom?.id || Date.now(),
+                    id: data.classroom?._id || Date.now(),
                     name: className,
                     subject: classSubject,
                     role: 'teacher',
-                    joinedAt: new Date().toISOString()
+                    joinedAt: new Date().toISOString(),
+                    code: data.classroom?.code
                 });
             } else {
                 this.showMessage(data.message || "Error creating classroom", "error");
@@ -202,11 +206,12 @@ class ClassroomManager {
                 
                 // Add to recent classrooms
                 this.addToRecentClassrooms({
-                    id: data.classroom?.id || Date.now(),
+                    id: data.classroom?._id || Date.now(),
                     name: data.classroom?.name || `Classroom ${joinCode}`,
                     subject: data.classroom?.subject || 'General',
                     role: 'student',
-                    joinedAt: new Date().toISOString()
+                    joinedAt: new Date().toISOString(),
+                    code: data.classroom?.code
                 });
             } else {
                 this.showMessage(data.message || "Error joining classroom", "error");
@@ -435,14 +440,16 @@ class ClassroomManager {
                 name: 'Advanced Physics',
                 subject: 'Physics',
                 role: 'student',
-                joinedAt: new Date(Date.now() - 86400000).toISOString()
+                joinedAt: new Date(Date.now() - 86400000).toISOString(),
+                code: 'ABC123'
             },
             {
                 id: 2,
                 name: 'Mathematics 101',
                 subject: 'Mathematics',
                 role: 'teacher',
-                joinedAt: new Date(Date.now() - 172800000).toISOString()
+                joinedAt: new Date(Date.now() - 172800000).toISOString(),
+                code: 'XYZ789'
             }
         ];
     }
@@ -479,8 +486,10 @@ class ClassroomManager {
             return;
         }
 
-        container.innerHTML = this.recentClassrooms.map(classroom => `
-            <div class="recent-classroom-item" onclick="openClassroomView(${classroom.id})">
+        container.innerHTML = this.recentClassrooms.map(classroom => {
+            const classId = classroom._id || classroom.id;
+            return `
+            <div class="recent-classroom-item" onclick="openClassroomView('${classId}')">
                 <div class="recent-classroom-header">
                     <div class="recent-classroom-icon">${classroom.role === 'teacher' ? '👨‍🏫' : '👨‍🎓'}</div>
                     <div class="recent-classroom-name">${classroom.name}</div>
@@ -490,8 +499,8 @@ class ClassroomManager {
                     <span>Role: ${classroom.role}</span>
                     <span>${this.formatDate(classroom.joinedAt)}</span>
                 </div>
-            </div>
-        `).join('');
+            </div>`;
+        }).join('');
     }
 
     formatDate(dateString) {
@@ -540,20 +549,22 @@ class ClassroomManager {
     }
 
     openClassroomView(classroomId) {
-        const classroom = this.recentClassrooms.find(c => c.id === classroomId);
+        const classroom = this.recentClassrooms.find(c => (c._id || c.id).toString() === classroomId.toString());
         if (classroom) {
             this.currentClassroom = classroom;
             
             // Populate classroom info
             document.getElementById('classroomTitle').textContent = classroom.name;
             document.getElementById('classroomSubject').textContent = classroom.subject;
-            document.getElementById('classroomCreated').textContent = this.formatDate(classroom.joinedAt);
             document.getElementById('classroomMemberCount').textContent = '4 members';
             document.getElementById('classroomRole').textContent = classroom.role;
-            
+            document.getElementById('classroomCode').textContent = classroom.code || '-';
+            const deleteBtn = document.getElementById('deleteClassroomBtn');
+            deleteBtn.textContent = classroom.role === 'teacher' ? 'Delete Classroom' : 'Leave Classroom';
+
             // Show modal
             document.getElementById('classroomViewModal').classList.add('active');
-            
+
             // Load default tab content
             this.renderResources();
         }
@@ -562,6 +573,33 @@ class ClassroomManager {
     closeClassroomView() {
         document.getElementById('classroomViewModal').classList.remove('active');
         this.currentClassroom = null;
+    }
+
+    async deleteCurrentClassroom() {
+        if (!this.currentClassroom) return;
+        const classroomId = this.currentClassroom._id || this.currentClassroom.id;
+        const isTeacher = this.currentClassroom.role === 'teacher';
+        if (!confirm(isTeacher ? 'Delete this classroom?' : 'Leave this classroom?')) return;
+        try {
+            const token = localStorage.getItem('token');
+            const url = `http://localhost:5002/api/classrooms/${classroomId}`;
+            const options = {
+                method: isTeacher ? 'DELETE' : 'POST',
+                headers: { 'Authorization': token }
+            };
+            if (!isTeacher) options.headers['Content-Type'] = 'application/json';
+            const endpoint = isTeacher ? url : `${url}/leave`;
+            const res = await fetch(endpoint, options);
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Operation failed');
+            this.recentClassrooms = this.recentClassrooms.filter(c => (c._id || c.id).toString() !== classroomId.toString());
+            this.saveRecentClassrooms();
+            this.closeClassroomView();
+            this.renderRecentClassrooms();
+            this.showMessage(isTeacher ? 'Classroom deleted' : 'Left classroom', 'success');
+        } catch (err) {
+            alert(err.message);
+        }
     }
 }
 

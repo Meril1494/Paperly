@@ -190,6 +190,23 @@ body {
   box-shadow: 0 8px 20px rgba(9, 12, 2, 0.2);
 }
 
+.btn-danger {
+  background: #f44336;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+
+.btn-danger:hover {
+  background: #d32f2f;
+}
+
+.classroom-actions {
+  margin-top: 20px;
+}
+
 .btn-icon {
   font-size: 1.2rem;
 }

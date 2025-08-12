@@ -75,15 +75,25 @@ router.post('/create', auth, async (req, res) => {
 //   }
 // });
 
-// Join a group (with or without code)
+// Join a group by ID or join code
 router.post('/join', auth, async (req, res) => {
   const { groupId, joinCode } = req.body;
+  const normalizedCode = joinCode ? joinCode.toUpperCase() : null;
 
   try {
-    const group = await Group.findById(groupId);
+    let group = null;
+
+    if (groupId) {
+      group = await Group.findById(groupId);
+    } else if (normalizedCode) {
+      group = await Group.findOne({ joinCode: normalizedCode });
+    } else {
+      return res.status(400).json({ message: 'Group ID or join code required' });
+    }
+
     if (!group) return res.status(404).json({ message: 'Group not found' });
 
-    if (group.isPrivate && group.joinCode !== joinCode) {
+    if (group.isPrivate && group.joinCode !== normalizedCode) {
       return res.status(403).json({ message: 'Invalid group code' });
     }
 
@@ -92,10 +102,44 @@ router.post('/join', auth, async (req, res) => {
       await group.save();
     }
 
-    res.json({ message: 'Joined group successfully' });
+    res.json({ message: 'Joined group successfully', group });
   } catch (err) {
     console.error('Join group error:', err);
     res.status(500).json({ message: 'Error joining group' });
+  }
+});
+
+// Leave a group
+router.post('/:id/leave', auth, async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) return res.status(404).json({ message: 'Group not found' });
+
+    group.members = group.members.filter(m => m.toString() !== req.user._id.toString());
+    await group.save();
+
+    res.json({ message: 'Left group successfully' });
+  } catch (err) {
+    console.error('Leave group error:', err);
+    res.status(500).json({ message: 'Error leaving group' });
+  }
+});
+
+// Delete a group
+router.delete('/:id', auth, async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id);
+    if (!group) return res.status(404).json({ message: 'Group not found' });
+
+    if (group.createdBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ message: 'Unauthorized to delete this group' });
+    }
+
+    await Group.findByIdAndDelete(req.params.id);
+    res.json({ message: 'Group deleted successfully' });
+  } catch (err) {
+    console.error('Delete group error:', err);
+    res.status(500).json({ message: 'Error deleting group' });
   }
 });
 

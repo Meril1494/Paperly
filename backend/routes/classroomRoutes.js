@@ -19,4 +19,7 @@ router.post('/:id/add', postController.addContent);
 // ✅ Delete a classroom (and its content)
 router.delete('/:id', auth, classroomController.deleteClassroom);  // <-- New route added
 
+// ✅ Leave a classroom
+router.post('/:id/leave', auth, classroomController.leaveClassroom);
+
 module.exports = router;

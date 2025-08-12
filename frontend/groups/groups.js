@@ -147,13 +147,21 @@ class GroupsManager {
     }
 
     createGroupCard(group, isMyGroup) {
+        const groupId = group._id || group.id;
+        const removeButton = isMyGroup ? (
+            group.role === 'admin'
+                ? `<button class="action-btn danger" onclick="deleteGroup('${groupId}')">Delete</button>`
+                : `<button class="action-btn danger" onclick="leaveGroup('${groupId}')">Leave</button>`
+        ) : '';
+
         const actionButtons = isMyGroup ? `
-            <button class="action-btn primary" onclick="openGroupDetails(${group.id}, true)">
+            <button class="action-btn primary" onclick="openGroupDetails('${groupId}', true)">
                 View Details
             </button>
-            <button class="action-btn" onclick="openGroupChat(${group.id})">
+            <button class="action-btn" onclick="openGroupChat('${groupId}')">
                 💬 Chat
             </button>
+            ${removeButton}
         ` : `
             <button class="action-btn primary" onclick="joinGroupById(${group.id})">
                 Join Group
@@ -164,7 +172,7 @@ class GroupsManager {
         `;
 
         return `
-            <div class="group-card" data-group-id="${group.id}">
+            <div class="group-card" data-group-id="${groupId}">
                 <div class="group-privacy">${group.privacy}</div>
                 <div class="group-header">
                     <div class="group-avatar">${group.avatar}</div>
@@ -173,20 +181,20 @@ class GroupsManager {
                         <span class="group-subject">${group.subject}</span>
                     </div>
                 </div>
-                
+
                 <p class="group-description">${group.description}</p>
-                
+
                 <div class="group-stats">
                     <div class="stat-item">
                         <span class="stat-icon">👥</span>
-                        <span>${group.members} members</span>
+                        <span>${this.getMemberCount(group)} members</span>
                     </div>
                     <div class="stat-item">
                         <span class="stat-icon">📝</span>
                         <span>${group.notes} notes</span>
                     </div>
                 </div>
-                
+
                 <div class="group-actions">
                     ${actionButtons}
                 </div>
@@ -223,13 +231,17 @@ class GroupsManager {
         `;
     }
 
+    getMemberCount(group) {
+        return Array.isArray(group.members) ? group.members.length : group.members;
+    }
+
     addGroupEventListeners() {
         const groupCards = document.querySelectorAll('.group-card');
         groupCards.forEach(card => {
             card.addEventListener('click', (e) => {
                 if (!e.target.closest('.group-actions')) {
-                    const groupId = parseInt(card.dataset.groupId);
-                    const isMyGroup = this.myGroups.some(g => g.id === groupId);
+                    const groupId = card.dataset.groupId;
+                    const isMyGroup = this.myGroups.some(g => (g._id || g.id).toString() === groupId);
                     this.openGroupDetails(groupId, isMyGroup);
                 }
             });
@@ -323,6 +335,7 @@ async createGroup() {
 
     const newGroup = {
       ...data.group,
+      members: Array.isArray(data.group.members) ? data.group.members.length : data.group.members,
       role: 'admin',
       avatar: name.substring(0, 2).toUpperCase(),
       joinDate: new Date().toISOString().split('T')[0],
@@ -394,34 +407,45 @@ async createGroup() {
 // }
 
 
-    joinGroup() {
-        const groupCode = document.getElementById('groupCode').value;
-        
-        if (!groupCode.trim()) {
+    async joinGroup() {
+        const groupCode = document.getElementById('groupCode').value.trim();
+
+        if (!groupCode) {
             alert('Please enter a group code');
             return;
         }
 
-        // Simulate joining group
-        const mockGroup = {
-            id: Date.now(),
-            name: 'Mock Group',
-            subject: 'general',
-            description: 'Joined via group code',
-            members: 15,
-            notes: 42,
-            privacy: 'private',
-            role: 'member',
-            avatar: 'MG',
-            joinDate: new Date().toISOString().split('T')[0]
-        };
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:5002/api/groups/join', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ joinCode: groupCode.toUpperCase() })
+            });
 
-        this.myGroups.unshift(mockGroup);
-        this.saveMyGroups();
-        this.renderMyGroups();
-        this.closeJoinModal();
-        
-        this.showMessage('Successfully joined group!', 'success');
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.message || 'Invalid group code');
+
+            const group = data.group;
+            const newGroup = {
+                ...group,
+                members: Array.isArray(group.members) ? group.members.length : group.members,
+                role: 'member',
+                avatar: group.name.substring(0, 2).toUpperCase(),
+                joinDate: new Date().toISOString().split('T')[0]
+            };
+
+            this.myGroups.unshift(newGroup);
+            this.saveMyGroups();
+            this.renderMyGroups();
+            this.closeJoinModal();
+            this.showMessage('Successfully joined group!', 'success');
+        } catch (err) {
+            alert(err.message);
+        }
     }
 
     joinGroupById(groupId) {
@@ -441,10 +465,48 @@ async createGroup() {
         }
     }
 
+    async deleteGroup(groupId) {
+        if (!confirm('Delete this group?')) return;
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`http://localhost:5002/api/groups/${groupId}`, {
+                method: 'DELETE',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Failed to delete group');
+            this.myGroups = this.myGroups.filter(g => (g._id || g.id).toString() !== groupId.toString());
+            this.saveMyGroups();
+            this.renderMyGroups();
+            this.showMessage('Group deleted successfully!', 'success');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    async leaveGroup(groupId) {
+        if (!confirm('Leave this group?')) return;
+        try {
+            const token = localStorage.getItem('token');
+            const res = await fetch(`http://localhost:5002/api/groups/${groupId}/leave`, {
+                method: 'POST',
+                headers: { 'Authorization': `Bearer ${token}` }
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.message || 'Failed to leave group');
+            this.myGroups = this.myGroups.filter(g => (g._id || g.id).toString() !== groupId.toString());
+            this.saveMyGroups();
+            this.renderMyGroups();
+            this.showMessage('Left group', 'success');
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
     openGroupDetails(groupId, isMyGroup) {
-        const group = isMyGroup ? 
-            this.myGroups.find(g => g.id === groupId) : 
-            this.discoverGroups.find(g => g.id === groupId);
+        const group = isMyGroup ?
+            this.myGroups.find(g => (g._id || g.id).toString() === groupId.toString()) :
+            this.discoverGroups.find(g => (g._id || g.id).toString() === groupId.toString());
 
         if (group) {
             this.showGroupDetails(group, isMyGroup);
@@ -455,6 +517,7 @@ async createGroup() {
         const modal = document.getElementById('groupDetailsModal');
         const content = document.getElementById('groupDetailsContent');
         
+        const groupId = group._id || group.id;
         content.innerHTML = `
             <div class="group-details-header">
                 <div class="group-details-avatar">${group.avatar}</div>
@@ -464,7 +527,7 @@ async createGroup() {
                     <div class="group-stats">
                         <div class="stat-item">
                             <span class="stat-icon">👥</span>
-                            <span>${group.members} members</span>
+                            <span>${this.getMemberCount(group)} members</span>
                         </div>
                         <div class="stat-item">
                             <span class="stat-icon">📝</span>
@@ -474,21 +537,22 @@ async createGroup() {
                             <span class="stat-icon">🔒</span>
                             <span>${group.privacy}</span>
                         </div>
+                        ${group.joinCode ? `<div class="stat-item"><span class="stat-icon">🔗</span><span>${group.joinCode}</span></div>` : ''}
                     </div>
                 </div>
             </div>
-            
+
             <div class="group-members">
                 <h4>Recent Members</h4>
-                ${this.generateMockMembers(group.members)}
+                ${this.generateMockMembers(this.getMemberCount(group))}
             </div>
-            
+
             <div class="group-actions">
                 ${isMyGroup ? `
-                    <button class="action-btn primary" onclick="openGroupChat(${group.id})">
+                    <button class="action-btn primary" onclick="openGroupChat('${groupId}')">
                         💬 Open Chat
                     </button>
-                    <button class="action-btn" onclick="shareNoteToGroup(${group.id})">
+                    <button class="action-btn" onclick="shareNoteToGroup('${groupId}')">
                         📝 Share Note
                     </button>
                 ` : `
@@ -599,6 +663,14 @@ function openGroupChat(groupId) {
 function shareNoteToGroup(groupId) {
     // This would open a note sharing modal
     alert('Note sharing functionality would be implemented here');
+}
+
+function deleteGroup(groupId) {
+    groupsManager.deleteGroup(groupId);
+}
+
+function leaveGroup(groupId) {
+    groupsManager.leaveGroup(groupId);
 }
 
 function clearFilters() {

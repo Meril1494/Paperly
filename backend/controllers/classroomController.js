@@ -119,3 +119,25 @@ exports.deleteClassroom = async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 };
+
+// ✅ Leave a classroom
+exports.leaveClassroom = async (req, res) => {
+  const classroomId = req.params.id;
+  const userId = req.user.id;
+
+  try {
+    const classroom = await Classroom.findById(classroomId);
+    if (!classroom) {
+      return res.status(404).json({ message: 'Classroom not found' });
+    }
+
+    classroom.members = classroom.members.filter(m => m.toString() !== userId);
+    await classroom.save();
+
+    await User.findByIdAndUpdate(userId, { $pull: { classrooms: classroomId } });
+
+    res.json({ message: 'Left classroom successfully' });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};

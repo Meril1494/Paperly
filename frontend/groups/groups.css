@@ -312,6 +312,17 @@ body {
     box-shadow: 0 4px 12px rgba(9, 12, 2, 0.3);
 }
 
+.action-btn.danger {
+    background: #f44336;
+    color: #fff;
+    border-color: #f44336;
+}
+
+.action-btn.danger:hover {
+    background: #d32f2f;
+    color: #fff;
+}
+
 .action-btn:hover:not(.primary) {
     background: rgba(9, 12, 2, 0.1);
     color: #090C02;
