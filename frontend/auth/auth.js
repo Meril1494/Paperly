@@ -16,11 +16,6 @@ class AuthManager {
             form.addEventListener('submit', (e) => this.handleFormSubmit(e));
         });
 
-        // Role toggle animations
-        const roleToggles = document.querySelectorAll('.toggle-switch input');
-        roleToggles.forEach(toggle => {
-            toggle.addEventListener('change', (e) => this.handleRoleToggle(e));
-        });
     }
 
     switchTab(tabName) {
@@ -76,12 +71,11 @@ class AuthManager {
         // CORRECTED: Use proper field names from the FormData object (from name attribute, not ID)
         const email = formData.get('email');      // was: formData.get('login-email')
         const password = formData.get('password'); // was: formData.get('login-password')
-        const role = document.getElementById('login-role-toggle').checked ? 'teacher' : 'student'; // unchanged
 
         fetch('http://localhost:5002/api/auth/login', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ email, password, role }) // unchanged
+            body: JSON.stringify({ email, password })
         })
         .then(res => res.json().then(data => ({ status: res.status, body: data })))
         .then(({ status, body }) => {
@@ -105,7 +99,6 @@ class AuthManager {
         const email = formData.get('email');
         const password = formData.get('password');
         const confirm = formData.get('confirmPassword');
-        const role = document.getElementById('signup-role-toggle').checked ? 'teacher' : 'student';
 
         if (password !== confirm) {
             this.showMessage("Passwords don't match", 'error');
@@ -115,7 +108,7 @@ class AuthManager {
         fetch('http://localhost:5002/api/auth/register', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ name, email, password, role })
+            body: JSON.stringify({ name, email, password })
         })
         .then(res => res.json().then(data => ({ status: res.status, body: data })))
         .then(({ status, body }) => {
@@ -134,15 +127,6 @@ class AuthManager {
     handleForgotPassword(formData) {
         const email = formData.get('forgot-email');
         this.showMessage(`If ${email} exists, a reset link will be sent.`, 'success');
-    }
-
-    handleRoleToggle(e) {
-        const toggle = e.target;
-        const label = toggle.nextElementSibling;
-        label.style.transform = 'scale(0.95)';
-        setTimeout(() => {
-            label.style.transform = 'scale(1)';
-        }, 150);
     }
 
     showMessage(message, type) {
