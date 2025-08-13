@@ -141,84 +141,6 @@ body {
     font-weight: 500;
 }
 
-.role-selector {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 30px;
-    padding: 12px 0;
-}
-
-.role-label {
-    font-size: 0.9rem;
-    color: #090C02;
-    font-weight: 500;
-}
-
-.toggle-switch {
-    display: flex;
-    align-items: center;
-}
-
-.toggle-switch input {
-    display: none;
-}
-
-.toggle-label {
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    gap: 10px;
-}
-
-.toggle-text {
-    font-size: 0.8rem;
-    color: #666;
-    font-weight: 500;
-    transition: color 0.3s ease;
-}
-
-.toggle-slider {
-    width: 50px;
-    height: 24px;
-    background: rgba(9, 12, 2, 0.1);
-    border-radius: 12px;
-    position: relative;
-    transition: background 0.3s ease;
-}
-
-.toggle-slider::before {
-    content: '';
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    background: white;
-    border-radius: 50%;
-    top: 2px;
-    left: 2px;
-    transition: transform 0.3s ease;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-}
-
-.toggle-switch input:checked + .toggle-label .toggle-slider {
-    background: #090C02;
-}
-
-.toggle-switch input:checked + .toggle-label .toggle-slider::before {
-    transform: translateX(26px);
-}
-
-.toggle-switch input:checked + .toggle-label .toggle-text:first-child {
-    color: #666;
-}
-
-.toggle-switch input:checked + .toggle-label .toggle-text:last-child {
-    color: #090C02;
-}
-
-.toggle-switch input:not(:checked) + .toggle-label .toggle-text:first-child {
-    color: #090C02;
-}
 
 .auth-btn {
     width: 100%;
@@ -233,6 +155,7 @@ body {
     transition: all 0.3s ease;
     position: relative;
     overflow: hidden;
+    margin-top: 10px;
 }
 
 .auth-btn::before {

@@ -4,7 +4,7 @@ const User = require('../models/User');
 
 // Register Controller
 const register = async (req, res) => {
-  const { name, email, password, role } = req.body;
+  const { name, email, password } = req.body;
 
   try {
     // Check if user already exists
@@ -15,8 +15,8 @@ const register = async (req, res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    // Create new user
-    user = new User({ name, email, password: hashedPassword, role });
+    // Create new user without role
+    user = new User({ name, email, password: hashedPassword });
     await user.save();
 
     // Generate token
@@ -31,20 +31,11 @@ const register = async (req, res) => {
 
 // Login Controller
 const login = async (req, res) => {
-  const { email, password, role } = req.body;
-
-  console.log("Login request body:", req.body);
+  const { email, password } = req.body;
 
   try {
-    // Check for both email and role match
-    const user = await User.findOne({ email, role });
-    console.log('User found with email & role:', user);
-
+    const user = await User.findOne({ email });
     if (!user) {
-      // Debug: Check if user exists with email alone
-      const userByEmail = await User.findOne({ email });
-      console.log('User found with email only:', userByEmail);
-
       return res.status(400).json({ message: 'User does not exist' });
     }
 
