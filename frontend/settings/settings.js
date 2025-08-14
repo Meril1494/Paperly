@@ -500,7 +500,7 @@ document.addEventListener('DOMContentLoaded', () => {
     settingsManager = new SettingsManager();
 });
 
-// Add CSS for animations and theme support
+// Add CSS for animations
 const style = document.createElement('style');
 style.textContent = `
     @keyframes slideIn {
@@ -512,83 +512,6 @@ style.textContent = `
         to { transform: translateX(100%); opacity: 0; }
     }
 
-    /* Theme support */
-    .theme-dark {
-        background: #121212 !important;
-        color: #e0e0e0 !important;
-    }
-
-    .theme-dark .main-content {
-        background: #121212 !important;
-    }
-
-    .theme-dark .settings-nav,
-    .theme-dark .settings-card,
-    .theme-dark .profile-card {
-        background: rgba(42, 42, 42, 0.9) !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    .theme-dark .page-header {
-        background: rgba(42, 42, 42, 0.9) !important;
-        border-color: rgba(255, 255, 255, 0.1) !important;
-    }
-
-    .theme-dark .page-title,
-    .theme-dark .section-title,
-    .theme-dark .card-title,
-    .theme-dark .setting-name {
-        color: #e0e0e0 !important;
-    }
-
-    .theme-dark .settings-nav-item {
-        color: #ccc !important;
-    }
-
-    .theme-dark .settings-nav-item:hover {
-        background: rgba(255, 255, 255, 0.05) !important;
-        color: #fff !important;
-    }
-
-    .theme-dark .settings-nav-item.active {
-        background: rgba(255, 255, 255, 0.1) !important;
-        color: #fff !important;
-    }
-
-    .theme-dark .page-subtitle,
-    .theme-dark .section-description,
-    .theme-dark .card-description,
-    .theme-dark .setting-desc,
-    .theme-dark .nav-text,
-    .theme-dark .storage-label,
-    .theme-dark .storage-value,
-    .theme-dark .form-hint {
-        color: #aaa !important;
-    }
-
-    .theme-dark input,
-    .theme-dark select,
-    .theme-dark textarea {
-        background: rgba(255, 255, 255, 0.1) !important;
-        border-color: rgba(255, 255, 255, 0.2) !important;
-        color: #e0e0e0 !important;
-    }
-
-    .theme-dark ::-webkit-scrollbar {
-        width: 8px;
-        background: #1a1a1a;
-    }
-
-    .theme-dark ::-webkit-scrollbar-thumb {
-        background: #333;
-        border-radius: 4px;
-    }
-
-    .theme-dark ::-webkit-scrollbar-thumb:hover {
-        background: #444;
-    }
-
-    /* Compact mode */
     .compact-mode .settings-card,
     .compact-mode .profile-card {
         padding: 20px !important;
