@@ -6,15 +6,15 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #F7FFF7;
-    color: #090C02;
+    background: var(--page-bg);
+    color: var(--text-color);
     line-height: 1.6;
 }
 
 .page-header {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-bg);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(9, 12, 2, 0.1);
+    border-bottom: 1px solid var(--border-color);
     padding: 30px 40px;
     margin-bottom: 30px;
 }
@@ -28,13 +28,13 @@ body {
 .page-title {
     font-size: 2.5rem;
     font-weight: 700;
-    color: #090C02;
+    color: var(--text-color);
     margin-bottom: 8px;
 }
 
 .page-subtitle {
     font-size: 1.1rem;
-    color: #666;
+    color: var(--text-muted);
     font-weight: 400;
 }
 
@@ -51,7 +51,7 @@ body {
 }
 
 .upload-section {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-bg);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 40px;
@@ -71,12 +71,12 @@ body {
 
 .upload-area:hover {
     border-color: rgba(9, 12, 2, 0.4);
-    background: rgba(9, 12, 2, 0.02);
+    background: var(--surface-bg-alt);
 }
 
 .upload-area.dragover {
-    border-color: #090C02;
-    background: rgba(9, 12, 2, 0.05);
+    border-color: var(--text-color);
+    background: var(--surface-bg-alt);
     transform: scale(1.02);
 }
 
@@ -95,17 +95,17 @@ body {
 .upload-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #090C02;
+    color: var(--text-color);
 }
 
 .upload-subtitle {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-muted);
     margin-bottom: 10px;
 }
 
 .upload-btn {
-    background: #090C02;
+    background: var(--text-color);
     color: white;
     border: none;
     padding: 12px 32px;
@@ -132,7 +132,7 @@ body {
     align-items: center;
     gap: 15px;
     padding: 15px;
-    background: rgba(9, 12, 2, 0.02);
+    background: var(--surface-bg-alt);
     border-radius: 12px;
 }
 
@@ -143,17 +143,17 @@ body {
 
 .info-text {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .info-text strong {
-    color: #090C02;
+    color: var(--text-color);
     display: block;
     margin-bottom: 2px;
 }
 
 .processing-section {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-bg);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 60px 40px;
@@ -180,8 +180,8 @@ body {
 .processing-spinner {
     width: 60px;
     height: 60px;
-    border: 4px solid rgba(9, 12, 2, 0.1);
-    border-top: 4px solid #090C02;
+    border: 4px solid var(--border-color);
+    border-top: 4px solid var(--text-color);
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
@@ -199,7 +199,7 @@ body {
 .processing-dots span {
     width: 8px;
     height: 8px;
-    background: #090C02;
+    background: var(--text-color);
     border-radius: 50%;
     animation: bounce 1.4s ease-in-out infinite both;
 }
@@ -215,12 +215,12 @@ body {
 .processing-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #090C02;
+    color: var(--text-color);
 }
 
 .processing-subtitle {
     font-size: 1rem;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .processing-steps {
@@ -244,28 +244,28 @@ body {
 .step-number {
     width: 30px;
     height: 30px;
-    background: rgba(9, 12, 2, 0.1);
+    background: var(--border-color);
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-weight: 600;
     font-size: 0.9rem;
-    color: #090C02;
+    color: var(--text-color);
 }
 
 .step.active .step-number {
-    background: #090C02;
+    background: var(--text-color);
     color: white;
 }
 
 .step-text {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .results-section {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-bg);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
@@ -279,13 +279,13 @@ body {
     align-items: center;
     margin-bottom: 30px;
     padding-bottom: 20px;
-    border-bottom: 1px solid rgba(9, 12, 2, 0.1);
+    border-bottom: 1px solid var(--border-color);
 }
 
 .results-title {
     font-size: 1.5rem;
     font-weight: 600;
-    color: #090C02;
+    color: var(--text-color);
 }
 
 .results-actions {
@@ -301,7 +301,7 @@ body {
     border: 1px solid rgba(9, 12, 2, 0.2);
     border-radius: 8px;
     background: white;
-    color: #090C02;
+    color: var(--text-color);
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
@@ -309,13 +309,13 @@ body {
 }
 
 .action-btn:hover {
-    background: #090C02;
+    background: var(--text-color);
     color: white;
     transform: translateY(-2px);
 }
 
 .action-btn.secondary {
-    background: rgba(9, 12, 2, 0.05);
+    background: var(--surface-bg-alt);
 }
 
 .btn-icon {
@@ -323,7 +323,7 @@ body {
 }
 
 .document-info {
-    background: rgba(9, 12, 2, 0.02);
+    background: var(--surface-bg-alt);
     border-radius: 12px;
     padding: 20px;
     margin-bottom: 25px;
@@ -334,7 +334,7 @@ body {
 
 .doc-icon {
     font-size: 2rem;
-    color: #090C02;
+    color: var(--text-color);
 }
 
 .doc-details {
@@ -344,20 +344,20 @@ body {
 .doc-name {
     font-size: 1.1rem;
     font-weight: 600;
-    color: #090C02;
+    color: var(--text-color);
     margin-bottom: 5px;
 }
 
 .doc-meta {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-muted);
     display: flex;
     gap: 20px;
 }
 
 .summary-tabs {
     display: flex;
-    background: rgba(9, 12, 2, 0.05);
+    background: var(--surface-bg-alt);
     border-radius: 12px;
     padding: 4px;
     margin-bottom: 25px;
@@ -372,18 +372,18 @@ body {
     cursor: pointer;
     font-size: 0.9rem;
     font-weight: 500;
-    color: #666;
+    color: var(--text-muted);
     transition: all 0.3s ease;
 }
 
 .summary-tab.active {
-    background: #090C02;
+    background: var(--text-color);
     color: white;
 }
 
 .summary-tab:hover:not(.active) {
-    background: rgba(9, 12, 2, 0.1);
-    color: #090C02;
+    background: var(--border-color);
+    color: var(--text-color);
 }
 
 .summary-content {
@@ -403,11 +403,11 @@ body {
 .summary-text {
     font-size: 1rem;
     line-height: 1.8;
-    color: #090C02;
-    background: rgba(9, 12, 2, 0.02);
+    color: var(--text-color);
+    background: var(--surface-bg-alt);
     padding: 25px;
     border-radius: 12px;
-    border-left: 4px solid #090C02;
+    border-left: 4px solid var(--text-color);
 }
 
 .key-points-list {
@@ -421,20 +421,20 @@ body {
     align-items: flex-start;
     gap: 12px;
     padding: 15px;
-    background: rgba(9, 12, 2, 0.02);
+    background: var(--surface-bg-alt);
     border-radius: 12px;
 }
 
 .key-point-icon {
     font-size: 1.2rem;
-    color: #090C02;
+    color: var(--text-color);
     flex-shrink: 0;
     margin-top: 2px;
 }
 
 .key-point-text {
     font-size: 0.95rem;
-    color: #090C02;
+    color: var(--text-color);
     line-height: 1.6;
 }
 
@@ -453,13 +453,13 @@ body {
 
 .highlight-text {
     font-size: 0.95rem;
-    color: #090C02;
+    color: var(--text-color);
     line-height: 1.6;
     font-style: italic;
 }
 
 .history-section {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-bg);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
@@ -469,7 +469,7 @@ body {
 .history-title {
     font-size: 1.3rem;
     font-weight: 600;
-    color: #090C02;
+    color: var(--text-color);
     margin-bottom: 20px;
 }
 
@@ -484,20 +484,20 @@ body {
     align-items: center;
     gap: 15px;
     padding: 15px;
-    background: rgba(9, 12, 2, 0.02);
+    background: var(--surface-bg-alt);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .history-item:hover {
-    background: rgba(9, 12, 2, 0.05);
+    background: var(--surface-bg-alt);
     transform: translateY(-2px);
 }
 
 .history-icon {
     font-size: 1.5rem;
-    color: #090C02;
+    color: var(--text-color);
     flex-shrink: 0;
 }
 
@@ -508,13 +508,13 @@ body {
 .history-name {
     font-size: 1rem;
     font-weight: 500;
-    color: #090C02;
+    color: var(--text-color);
     margin-bottom: 3px;
 }
 
 .history-date {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .history-actions {
@@ -529,19 +529,19 @@ body {
     border-radius: 6px;
     cursor: pointer;
     font-size: 1rem;
-    color: #666;
+    color: var(--text-muted);
     transition: all 0.3s ease;
 }
 
 .history-action:hover {
-    background: rgba(9, 12, 2, 0.1);
-    color: #090C02;
+    background: var(--border-color);
+    color: var(--text-color);
 }
 
 .empty-history {
     text-align: center;
     padding: 40px;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .empty-icon {
@@ -557,7 +557,7 @@ body {
 
 .empty-subtext {
     font-size: 0.9rem;
-    color: #999;
+    color: var(--text-muted);
 }
 
 @keyframes fadeInUp {
