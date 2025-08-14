@@ -166,5 +166,13 @@ function logout() {
 
 // Initialize sidebar when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
+    // Apply saved theme preference across pages
+    const settings = JSON.parse(localStorage.getItem('paperly_settings') || '{}');
+    let theme = settings.theme || 'light';
+    if (theme === 'auto' && window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        theme = 'dark';
+    }
+    document.body.classList.toggle('theme-dark', theme === 'dark');
+
     new Sidebar();
 });
