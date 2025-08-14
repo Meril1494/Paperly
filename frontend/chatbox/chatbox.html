@@ -72,7 +72,8 @@
   <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 
   <script>
-    const socket = io('http://localhost:5000'); // Adjust the port if needed
+    const socket = io('http://localhost:5002');
+    const roomId = 'global';
 
     const messagesContainer = document.getElementById('messages');
     const messageInput = document.getElementById('messageInput');
@@ -80,11 +81,14 @@
 
     socket.on('connect', () => {
       console.log('✅ Connected to Socket.IO server');
+      socket.emit('joinRoom', roomId);
     });
 
-    socket.on('chat message', (msg) => {
+    
+      socket.on('chatMessage', (data) => {
       const div = document.createElement('div');
-      div.innerText = msg;
+      const text = data.message || data;
+      div.innerText = text;
       div.style.marginBottom = '10px';
       div.style.padding = '10px';
       div.style.background = '#f1f1f1';
@@ -112,7 +116,7 @@
     function sendMessage() {
       const msg = messageInput.value;
       if (msg.trim() !== '') {
-        socket.emit('chat message', msg);
+        socket.emit('chatMessage', { roomId, message: msg });
         addChatListItem(msg);
         messageInput.value = '';
       }
