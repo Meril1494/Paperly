@@ -6,15 +6,15 @@
 
 body {
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-    background: #F7FFF7;
-    color: #090C02;
+    background: var(--page-bg);
+    color: var(--text-color);
     line-height: 1.6;
 }
 
 .page-header {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-bg);
     backdrop-filter: blur(10px);
-    border-bottom: 1px solid rgba(9, 12, 2, 0.1);
+    border-bottom: 1px solid var(--border-color);
     padding: 30px 40px;
     margin-bottom: 30px;
 }
@@ -28,12 +28,12 @@ body {
     font-size: 2.5rem;
     font-weight: 700;
     margin-bottom: 8px;
-    color: #090C02;
+    color: var(--text-color);
 }
 
 .page-subtitle {
     font-size: 1.1rem;
-    color: #666;
+    color: var(--text-muted);
     font-weight: 400;
 }
 
@@ -58,7 +58,7 @@ body {
 }
 
 .stat-card {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-bg);
     backdrop-filter: blur(10px);
     border-radius: 16px;
     padding: 25px;
@@ -82,7 +82,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(9, 12, 2, 0.05);
+    background: var(--surface-bg-alt);
     border-radius: 12px;
 }
 
@@ -93,13 +93,13 @@ body {
 .stat-number {
     font-size: 2rem;
     font-weight: 700;
-    color: #090C02;
+    color: var(--text-color);
     margin-bottom: 4px;
 }
 
 .stat-label {
     font-size: 0.9rem;
-    color: #666;
+    color: var(--text-muted);
     font-weight: 500;
 }
 
@@ -107,7 +107,7 @@ body {
 .quick-actions,
 .recent-notes,
 .group-updates {
-    background: rgba(255, 255, 255, 0.9);
+    background: var(--surface-bg);
     backdrop-filter: blur(10px);
     border-radius: 20px;
     padding: 30px;
@@ -125,13 +125,13 @@ body {
 .section-title {
     font-size: 1.4rem;
     font-weight: 600;
-    color: #090C02;
+    color: var(--text-color);
 }
 
 .view-all-btn {
     background: none;
     border: none;
-    color: #090C02;
+    color: var(--text-color);
     font-size: 0.9rem;
     font-weight: 500;
     cursor: pointer;
@@ -141,7 +141,7 @@ body {
 }
 
 .view-all-btn:hover {
-    background: rgba(9, 12, 2, 0.1);
+    background: var(--border-color);
 }
 
 .activity-list {
@@ -155,7 +155,7 @@ body {
     align-items: center;
     gap: 15px;
     padding: 15px 0;
-    border-bottom: 1px solid rgba(9, 12, 2, 0.05);
+    border-bottom: 1px solid var(--surface-bg-alt);
 }
 
 .activity-item:last-child {
@@ -169,7 +169,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(9, 12, 2, 0.05);
+    background: var(--surface-bg-alt);
     border-radius: 10px;
     flex-shrink: 0;
 }
@@ -181,13 +181,13 @@ body {
 .activity-title {
     font-size: 1rem;
     font-weight: 500;
-    color: #090C02;
+    color: var(--text-color);
     margin-bottom: 4px;
 }
 
 .activity-time {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .actions-grid {
@@ -197,8 +197,8 @@ body {
 }
 
 .action-card {
-    background: rgba(9, 12, 2, 0.03);
-    border: 1px solid rgba(9, 12, 2, 0.1);
+    background: var(--surface-bg-alt);
+    border: 1px solid var(--border-color);
     border-radius: 12px;
     padding: 20px;
     cursor: pointer;
@@ -211,7 +211,7 @@ body {
 }
 
 .action-card:hover {
-    background: rgba(9, 12, 2, 0.08);
+    background: var(--surface-bg-alt);
     transform: translateY(-3px);
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
 }
@@ -224,7 +224,7 @@ body {
 .action-title {
     font-size: 0.9rem;
     font-weight: 500;
-    color: #090C02;
+    color: var(--text-color);
 }
 
 .notes-list,
@@ -240,14 +240,14 @@ body {
     align-items: center;
     gap: 15px;
     padding: 15px 0;
-    border-bottom: 1px solid rgba(9, 12, 2, 0.05);
+    border-bottom: 1px solid var(--surface-bg-alt);
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .note-item:hover,
 .update-item:hover {
-    background: rgba(9, 12, 2, 0.02);
+    background: var(--surface-bg-alt);
     border-radius: 8px;
     padding: 15px;
     margin: 0 -15px;
@@ -266,7 +266,7 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: rgba(9, 12, 2, 0.05);
+    background: var(--surface-bg-alt);
     border-radius: 10px;
     flex-shrink: 0;
 }
@@ -280,7 +280,7 @@ body {
 .update-title {
     font-size: 1rem;
     font-weight: 500;
-    color: #090C02;
+    color: var(--text-color);
     margin-bottom: 4px;
 }
 
@@ -293,12 +293,12 @@ body {
 .note-date,
 .update-time {
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-muted);
 }
 
 .note-tag {
-    background: rgba(9, 12, 2, 0.1);
-    color: #090C02;
+    background: var(--border-color);
+    color: var(--text-color);
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 0.8rem;
@@ -396,15 +396,15 @@ body {
 .joined-classrooms-container {
   margin-top: 30px;
   padding: 15px;
-  background: #f9f9f9;
+  background: var(--surface-bg);
   border-radius: 10px;
 }
 
 .joined-classroom-card {
   padding: 10px;
   margin-bottom: 8px;
-  background-color: #fff;
-  border: 1px solid #ddd;
+  background-color: var(--surface-bg);
+  border: 1px solid var(--border-color);
   border-radius: 8px;
   font-weight: 500;
 }
